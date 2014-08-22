@@ -11,10 +11,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "asserts.hpp"
+#include "engine.hpp"
 #include "font.hpp"
+#include "generate_cave.hpp"
+#include "node_utils.hpp"
+#include "profile_timer.hpp"
 #include "render.hpp"
 #include "render_text.hpp"
 #include "sdl_wrapper.hpp"
+#include "unit_test.hpp"
 #include "wm.hpp"
 
 #define FRAME_RATE	(static_cast<int>(1000.0/60.0))
@@ -76,19 +81,31 @@ void draw_ui(const glm::mat4& ortho_camera)
 	graphics::render::text::quick_draw(0, r.y2(), ss2.str(), "SourceCodePro-Regular.ttf", 14, graphics::color(1.0f, 1.0f, 0.5f));
 }
 
+node get_cave_params()
+{
+	node_builder res;
+	node_builder pass;
+	res.add("thresholds", 0.4);
+	pass.add("iterations", 1)
+		.add("thresholds", [](const node& args) { return node::from_bool(args.as_int() >= 5); })
+		.add("thresholds", [](const node& args) { return node::from_bool(args.as_int() < 1); });
+	res.add("passes", pass.build());
+	pass.clear()
+		.add("iterations", 2)
+		.add("thresholds", [](const node& args) { return node::from_bool(args.as_int() >= 5); });
+	res.add("passes", pass.build());
+	return res.build();
+}
+
 void draw_xxx()
 {
-	std::vector<std::string> ary;
-	for(int n = 0; n < 8; ++n) {
-		ary.emplace_back("################");
-		ary.emplace_back("................");
-	}
+	//static std::vector<std::string> cave = generator::cave(32, 32, get_cave_params());
+	static std::vector<std::string> cave = generator::cave_fixed_param(256, 256);
 
-	rect r = rect(100, 100);
-	for(auto& s : ary) {
-		r = graphics::render::text::quick_draw(100, r.y2(), s, "SourceCodePro-Regular.ttf", 24, graphics::color(1.0f, 1.0f, 1.0f));
+	rect r = rect(0, 0);
+	for(auto& s : cave) {
+		r = graphics::render::text::quick_draw(r.x(), r.y2(), s, "SourceCodePro-Regular.ttf", 20, graphics::color(1.0f, 1.0f, 1.0f));
 	}
-
 }
 
 void draw_stuff(const glm::mat4& camera)
@@ -126,6 +143,11 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	if(!test::run_tests()) {
+		// Just exit if some tests failed.
+		exit(1);
+	}
+
 	try {
 		graphics::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 		graphics::window_manager wm;
@@ -149,6 +171,13 @@ int main(int argc, char* argv[])
 
 		graphics::render::manager render_manager;
 		font::manager font_manager;
+
+		engine e;
+		entity_ptr player = std::make_shared<entity>();
+		player->add(std::make_shared<position_component>(0, 0));
+		// display component should take a texture used to display the player.
+		player->add(std::make_shared<display_component>());
+		e.add_entity(player);
 
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();

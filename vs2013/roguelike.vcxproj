@@ -12,27 +12,44 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\color.cpp" />
+    <ClCompile Include="..\src\component.cpp" />
+    <ClCompile Include="..\src\engine.cpp" />
+    <ClCompile Include="..\src\entity.cpp" />
     <ClCompile Include="..\src\filesystem.cpp" />
     <ClCompile Include="..\src\font.cpp" />
+    <ClCompile Include="..\src\generate_cave.cpp" />
     <ClCompile Include="..\src\GLee.c" />
+    <ClCompile Include="..\src\json.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\node.cpp" />
+    <ClCompile Include="..\src\node_utils.cpp" />
     <ClCompile Include="..\src\notify.cpp" />
     <ClCompile Include="..\src\render.cpp" />
     <ClCompile Include="..\src\render_text.cpp" />
     <ClCompile Include="..\src\shaders.cpp" />
     <ClCompile Include="..\src\surface.cpp" />
+    <ClCompile Include="..\src\system.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
+    <ClCompile Include="..\src\unit_test.cpp" />
     <ClCompile Include="..\src\wm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\basic_dir_monitor.hpp" />
     <ClInclude Include="..\src\color.hpp" />
+    <ClInclude Include="..\src\component.hpp" />
     <ClInclude Include="..\src\dir_monitor.hpp" />
+    <ClInclude Include="..\src\engine.hpp" />
+    <ClInclude Include="..\src\entity.hpp" />
     <ClInclude Include="..\src\filesystem.hpp" />
     <ClInclude Include="..\src\font.hpp" />
+    <ClInclude Include="..\src\formatter.hpp" />
+    <ClInclude Include="..\src\generate_cave.hpp" />
     <ClInclude Include="..\src\geometry.hpp" />
     <ClInclude Include="..\src\GLee.h" />
     <ClInclude Include="..\src\graphics.hpp" />
+    <ClInclude Include="..\src\json.hpp" />
+    <ClInclude Include="..\src\node.hpp" />
+    <ClInclude Include="..\src\node_utils.hpp" />
     <ClInclude Include="..\src\profile_timer.hpp" />
     <ClInclude Include="..\src\ref_counted_ptr.hpp" />
     <ClInclude Include="..\src\render.hpp" />
@@ -40,11 +57,14 @@
     <ClInclude Include="..\src\sdl_wrapper.hpp" />
     <ClInclude Include="..\src\shaders.hpp" />
     <ClInclude Include="..\src\surface.hpp" />
+    <ClInclude Include="..\src\system.hpp" />
     <ClInclude Include="..\src\texture.hpp" />
+    <ClInclude Include="..\src\unit_test.hpp" />
     <ClInclude Include="..\src\wm.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\assimp-3.1.1\lib32\assimp.lib" />
+    <Library Include="..\..\noise\win32\Release\libnoise.lib" />
     <Library Include="..\..\SDL\VisualC\Win32\Release\SDL2.lib" />
     <Library Include="..\..\SDL\VisualC\Win32\Release\SDL2main.lib" />
     <Library Include="..\..\SDL_image\VisualC\Win32\Release\SDL2_image.lib" />
@@ -90,6 +110,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,12 +138,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Temp\Projects\boost;C:\Temp\Projects\SDL\include;C:\Temp\Projects\SDL_image;C:\Temp\Projects\SDL_mixer;C:\Temp\Projects\SDL_ttf;c:\temp\Projects\roguelike\include;C:\Temp\Projects\assimp-3.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Temp\Projects\boost\stage32-release-static\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
