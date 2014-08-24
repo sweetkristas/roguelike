@@ -1,12 +1,14 @@
 #include <algorithm>
 
 #include "asserts.hpp"
+#include "component.hpp"
 #include "engine.hpp"
 #include "profile_timer.hpp"
 
 engine::engine(graphics::window_manager& wm)
 	: wm_(wm),
 	  turns_(1),
+	  entity_quads_(0, rect(0,0,100,100)),
 	  state_(EngineState::PLAY)
 {
 }
@@ -81,6 +83,33 @@ void engine::process_events()
 	}
 }
 
+void engine::populate_quadtree()
+{
+	entity_quads_.clear();
+	
+	// only add entities to the quadtree that meet are collidable, but not maps
+	static component_id collision_mask 
+		= (1 << component::Component::POSITION)
+		| (1 << component::Component::SPRITE)
+		| (1 << component::Component::COLLISION);
+	static component_id collision_map_mask = collision_mask | (1 << component::Component::MAP);
+
+	for(auto& e : entity_list_) {
+		if((e->get()->mask & collision_map_mask) == collision_mask) {
+			auto& pos = e->get()->pos->p;
+			auto& spr = e->get()->spr;
+			entity_quads_.insert(e, rect(pos.x, pos.y, spr->width, spr->height));
+		}
+	}
+}
+
+std::vector<entity_ptr> engine::entities_in_area(const rect& r)
+{
+	std::vector<entity_ptr> res;
+	entity_quads_.get_collidable(res, r);
+	return res;
+}
+
 bool engine::update(double time)
 {
 	process_events();
@@ -88,6 +117,7 @@ bool engine::update(double time)
 		return state_ == EngineState::PAUSE ? true : false;
 	}
 
+	populate_quadtree();
 	for(auto& p : process_list_) {
 		p->update(*this, time, entity_list_);
 	}

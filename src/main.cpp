@@ -267,7 +267,8 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::render>());
 		e.add_process(std::make_shared<process::controller>());
 		e.add_process(std::make_shared<process::gui>());
-		e.add_process(std::make_shared<process::collision>());
+		e.add_process(std::make_shared<process::em_collision>());
+		e.add_process(std::make_shared<process::ee_collision>());
 
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();

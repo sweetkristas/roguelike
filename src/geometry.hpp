@@ -110,8 +110,8 @@ namespace geometry
 		T w() const { return bottom_right_.x - top_left_.x; }
 		T h() const { return bottom_right_.y - top_left_.y; }
 
-		T mid_x() const { return (x1() + x2())/2; }
-		T mid_y() const { return (y1() + y2())/2; }
+		T mid_x() const { return (x1() + x2())/static_cast<T>(2); }
+		T mid_y() const { return (y1() + y2())/static_cast<T>(2); }
 
 		bool empty() const { return w() == 0 || h() == 0; }
 
@@ -141,6 +141,9 @@ namespace geometry
 		Point<T> top_left_;
 		Point<T> bottom_right_;
 	};
+
+	template<typename T> inline
+	bool operator<(const Rect<T>& a, const Rect<T>& b);
 
 	/*template<> inline 
 	Rect<int>::Rect(const variant& v)

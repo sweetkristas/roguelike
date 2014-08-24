@@ -122,6 +122,12 @@ namespace geometry
 		from_vector(v);
 	}
 
+	template<typename T> inline
+	bool operator<(const Rect<T>& a, const Rect<T>& b)
+	{
+		return a.top_left() == b.top_left() ? a.w() == b.w() ? a.h() < b.h() : a.w() < b.w() : a.top_left() < b.top_left();
+	}
+
 	/*template<typename T> inline
 	Rect<T>::Rect(const variant& v)
 	{

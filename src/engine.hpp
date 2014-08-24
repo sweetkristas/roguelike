@@ -7,6 +7,7 @@
 #include "entity.hpp"
 #include "geometry.hpp"
 #include "process.hpp"
+#include "quadtree.hpp"
 #include "wm.hpp"
 
 enum class EngineState {
@@ -41,12 +42,16 @@ public:
 
 	void set_camera(const point& cam) { camera_ = cam; }
 	const point& get_camera() { return camera_; }
+
+	std::vector<entity_ptr> entities_in_area(const rect& r);
 private:
 	void process_events();
+	void populate_quadtree();
 	EngineState state_;
 	int turns_;
 	point camera_;
 	graphics::window_manager& wm_;
 	std::vector<entity_ptr> entity_list_;
+	quadtree<entity_ptr> entity_quads_;
 	std::vector<process::process_ptr> process_list_;
 };
