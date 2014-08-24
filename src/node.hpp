@@ -53,6 +53,7 @@ public:
 	const node_list& as_list() const;
 	const node_map& as_map() const;
 	const node_fn as_function() const;
+	std::vector<std::string> as_list_strings() const;
 
 	node_list& as_mutable_list();
 	node_map& as_mutable_map();

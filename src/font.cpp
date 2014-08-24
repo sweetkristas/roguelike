@@ -59,6 +59,45 @@ namespace font
 		return it->second;
 	}
 
+	SDL_Surface* render(const std::string& utf8, const font_ptr& fnt, const graphics::color& color)
+	{
+		return TTF_RenderUTF8_Blended(fnt.get(), utf8.c_str(), color.as_sdl_color());
+	}
+
+	SDL_Surface* render_shaded(const std::string& utf8, const font_ptr& fnt, const graphics::color& fg, const graphics::color& bg)
+	{
+		return TTF_RenderUTF8_Shaded(fnt.get(), utf8.c_str(), fg.as_sdl_color(), bg.as_sdl_color());
+	}
+
+	void get_glyph_metrics(const font_ptr& fnt, int ch, int *w, int *h, glyph_metrics* gm)
+	{
+		// Excludes kerning for obvious(1) reasons.
+		// (1) obvious in this context means that we're only considering one character and kerning
+		//     requires knowledge of a pair of characters.
+		int minx, maxx, miny, maxy, advance;
+		auto res = TTF_GlyphMetrics(fnt.get(), ch, &minx, &maxx, &miny, &maxy, &advance);
+		ASSERT_LOG(res == 0, "Error getting font metrics for character '" << static_cast<char>(ch) << "' : " << SDL_GetError());
+		if(w) {
+			*w = advance;
+		}
+		if(h) {
+			*h = TTF_FontHeight(fnt.get());
+		}
+		if(gm) {
+			gm->minx = minx;
+			gm->maxx = maxx;
+			gm->miny = maxy;
+			gm->minx = minx;
+			gm->advance = advance;
+		}
+	}
+
+	void get_text_size(const font_ptr& fnt, const std::string& utf8, int* w, int* h)
+	{
+		auto res = TTF_SizeText(fnt.get(), utf8.c_str(), w, h);
+		ASSERT_LOG(res == 0, "Unable to get text size of string: '" << utf8 << "' : " << SDL_GetError());
+	}
+
 	manager::manager()
 	{
 		ASSERT_LOG(TTF_Init() != -1, "TTF_Init error(): " << TTF_GetError());

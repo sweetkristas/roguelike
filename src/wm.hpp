@@ -9,8 +9,11 @@ namespace graphics
 		void create_window(const std::string& title, int x, int y, int w, int h, Uint32 flags);
 		void gl_init();
 		void set_icon(const std::string& icon);
+		SDL_Renderer* get_renderer() { return renderer_; }
 		void swap();
 		virtual ~window_manager();	
+		int width() const { return width_; }
+		int height() const { return height_; }
 	private:
 		SDL_Window* window_;
 		SDL_GLContext glcontext_;

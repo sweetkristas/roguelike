@@ -1,30 +1,79 @@
+#include "asserts.hpp"
 #include "component.hpp"
 
-component::component(const std::string& id)
-	: id_(id)
+namespace component
 {
-}
+	sprite::sprite(SDL_Renderer* renderer, SDL_Surface* surf) 
+		: component(Component::SPRITE),
+		  tex(NULL)
+	{
+		if(surf != NULL) {
+			tex = SDL_CreateTextureFromSurface(renderer, surf);
+			ASSERT_LOG(tex != NULL, "Couldn't create texture from surface: " << SDL_GetError());
+			width = surf->w;
+			height = surf->h;
+			SDL_FreeSurface(surf);
+		}
+	}
 
-component::~component()
-{
-}
+	sprite::~sprite()
+	{
+		if(tex != NULL) {
+			SDL_DestroyTexture(tex);
+		}
+	}
 
-position_component::position_component(int x, int y)
-	: component("position"), 
-	  x_(x),
-	  y_(y)
-{
-}
+	void sprite::update_texture(SDL_Renderer* renderer, SDL_Surface* surf)
+	{
+		if(tex != NULL) {
+			SDL_DestroyTexture(tex);
+		}
+		if(surf != NULL) {
+			tex = SDL_CreateTextureFromSurface(renderer, surf);
+			ASSERT_LOG(tex != NULL, "Couldn't create texture from surface: " << SDL_GetError());
+			width = surf->w;
+			height = surf->h;
+			SDL_FreeSurface(surf);
+		}
+	}
 
-position_component::~position_component()
-{
-}
+	lights::lights() 
+		: component(Component::LIGHTS), 
+		  tex(NULL)
+	{
+	}
 
-display_component::display_component()
-	: component("display")
-{
-}
+	lights::~lights()
+	{
+		if(tex != NULL) {
+			SDL_DestroyTexture(tex);
+		}
+	}
 
-display_component::~display_component()
-{
+	mapgrid::mapgrid(const node& n)
+		: component(Component::MAP)
+	{
+		auto mp = n["map"].as_list_strings();
+		map.reserve(mp.size());
+		int y = 0;
+		for(auto& row : mp) {
+			int x = 0;
+			std::vector<MapSymbols> new_row;
+			new_row.reserve(row.size());
+			for(auto& col : row) {
+				MapSymbols sym = convert_map_symbol(col);
+				if(sym == MapSymbols::EXIT) {
+					exits.emplace_back(x, y);
+					sym = MapSymbols::DIRT;
+				} else if(sym == MapSymbols::START) {
+					start = point(x, y);
+					sym = MapSymbols::DIRT;
+				}
+				new_row.emplace_back(sym);
+				++x;
+			}
+			map.emplace_back(new_row);
+			++y;
+		}
+	}
 }

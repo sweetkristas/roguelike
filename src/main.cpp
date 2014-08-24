@@ -11,13 +11,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "asserts.hpp"
+#include "collision_process.hpp"
+#include "controller_process.hpp"
 #include "engine.hpp"
 #include "font.hpp"
 #include "generate_cave.hpp"
+#include "gui_process.hpp"
+#include "json.hpp"
+#include "input_process.hpp"
 #include "node_utils.hpp"
 #include "profile_timer.hpp"
-#include "render.hpp"
-#include "render_text.hpp"
+#include "render_process.hpp"
 #include "sdl_wrapper.hpp"
 #include "unit_test.hpp"
 #include "wm.hpp"
@@ -39,30 +43,6 @@ void sdl_gl_setup()
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 }
 
-bool process_events()
-{
-	SDL_Event e;
-	while(SDL_PollEvent(&e)) {
-		switch(e.type) {
-			case SDL_MOUSEWHEEL:
-				break;
-			case SDL_QUIT:
-				return false;
-			case SDL_KEYDOWN:
-				if(e.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
-					return false;
-				} else if(e.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-				} else if(e.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-				} else if(e.key.keysym.scancode == SDL_SCANCODE_DOWN) {
-				} else if(e.key.keysym.scancode == SDL_SCANCODE_UP) {
-				}
-				break;
-		}
-	}
-
-	return true;
-}
-
 namespace
 {
 	int frame_render_time;
@@ -71,17 +51,14 @@ namespace
 
 void draw_ui(const glm::mat4& ortho_camera)
 {
-	graphics::render::set_p_matrix(ortho_camera);
-	graphics::render::set_mv_matrix(glm::mat4(1.0f));
-
-	std::stringstream ss1, ss2;
-	ss1 << "Frame draw time (uS): " << std::fixed << frame_render_time;
-	auto r = graphics::render::text::quick_draw(0, 600-40, ss1.str(), "SourceCodePro-Regular.ttf", 14, graphics::color(1.0f, 1.0f, 0.5f));
-	ss2 << "Frame process time (uS): " << std::fixed << frame_processing_time;
-	graphics::render::text::quick_draw(0, r.y2(), ss2.str(), "SourceCodePro-Regular.ttf", 14, graphics::color(1.0f, 1.0f, 0.5f));
+//	std::stringstream ss1, ss2;
+//	ss1 << "Frame draw time (uS): " << std::fixed << frame_render_time;
+//	auto r = graphics::render::text::quick_draw(0, 600-40, ss1.str(), "SourceCodePro-Regular.ttf", 14, graphics::color(1.0f, 1.0f, 0.5f));
+//	ss2 << "Frame process time (uS): " << std::fixed << frame_processing_time;
+//	graphics::render::text::quick_draw(0, r.y2(), ss2.str(), "SourceCodePro-Regular.ttf", 14, graphics::color(1.0f, 1.0f, 0.5f));
 }
 
-node get_cave_params()
+/*node get_cave_params()
 {
 	node_builder res;
 	node_builder pass;
@@ -95,28 +72,131 @@ node get_cave_params()
 		.add("thresholds", [](const node& args) { return node::from_bool(args.as_int() >= 5); });
 	res.add("passes", pass.build());
 	return res.build();
-}
+}*/
 
-void draw_xxx()
+
+SDL_Surface* make_surface_from_strings(const std::vector<std::string>& strs)
 {
-	//static std::vector<std::string> cave = generator::cave(32, 32, get_cave_params());
-	static std::vector<std::string> cave = generator::cave_fixed_param(256, 256);
-
-	rect r = rect(0, 0);
-	for(auto& s : cave) {
-		r = graphics::render::text::quick_draw(r.x(), r.y2(), s, "SourceCodePro-Regular.ttf", 20, graphics::color(1.0f, 1.0f, 1.0f));
+	std::vector<SDL_Surface*> surfaces;
+	surfaces.reserve(strs.size());
+	graphics::color white(255,255,255);
+	int max_height = 0;
+	int max_width = -1;
+	font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
+	for(auto& s : strs) {
+		auto surf = font::render(s, fnt, white);
+		max_height += surf->h;
+		if(surf->w > max_width) {
+			max_width = surf->w;
+		}
+		surfaces.emplace_back(surf);
 	}
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    Uint32 rmask = 0xff000000;
+    Uint32 gmask = 0x00ff0000;
+    Uint32 bmask = 0x0000ff00;
+    Uint32 amask = 0x000000ff;
+#else
+    Uint32 rmask = 0x000000ff;
+    Uint32 gmask = 0x0000ff00;
+    Uint32 bmask = 0x00ff0000;
+    Uint32 amask = 0xff000000;
+#endif	
+	auto dst = SDL_CreateRGBSurface(0, max_width, max_height, 32, rmask, gmask, bmask, amask);
+	SDL_SetSurfaceBlendMode(dst, SDL_BLENDMODE_NONE);
+	ASSERT_LOG(dst != NULL, "Error creating destination surface: " << SDL_GetError());
+	int height = 0;
+	for(auto& surf : surfaces) {
+		SDL_Rect dr = {0, height, surf->w, surf->h};
+		SDL_BlitSurface(surf, NULL, dst, &dr);
+		height += surf->h;
+		SDL_FreeSurface(surf);
+	}
+	return dst;
 }
 
-void draw_stuff(const glm::mat4& camera)
+std::vector<std::string> convert_map_to_strings(const map_type& m)
 {
-	graphics::render::set_p_matrix(camera);
-	graphics::render::set_mv_matrix(glm::mat4(1.0f));
-
-	//graphics::render::draw_hexagon(0, 0, 1);
-	draw_xxx();
+	std::vector<std::string> res;
+	res.reserve(m.size());
+	for(auto& row : m) {
+		std::string s;
+		for(auto& col : row) {
+			s += convert_map_symbol_to_char(col);
+		}
+		res.emplace_back(s);
+	}
+	return res;
 }
 
+SDL_Surface* make_surface_from_map(const map_type& m)
+{
+	return make_surface_from_strings(convert_map_to_strings(m));
+}
+
+void create_player(engine& e, const point& start)
+{
+	entity_ptr player = std::make_shared<entity>();
+	// Player component simply acts as a tag for the entity
+	font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
+	player->get()->mask |= 1 << component::Component::PLAYER;
+	player->get()->mask |= 1 << component::Component::POSITION;
+	player->get()->mask |= 1 << component::Component::STATS;
+	player->get()->mask |= 1 << component::Component::INPUT;
+	player->get()->mask |= 1 << component::Component::SPRITE;
+	player->get()->mask |= 1 << component::Component::COLLISION;
+	player->get()->pos = std::make_shared<component::position>(start);
+	player->get()->stat = std::make_shared<component::stats>(10);
+	player->get()->inp = std::make_shared<component::input>();
+	auto surf = font::render_shaded("@", fnt, graphics::color(255,255,255), graphics::color(255,0,0));
+	player->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), surf);
+	e.add_entity(player);
+
+	// Create GUI (needs player stats to we stick it in here for now)
+	entity_ptr gui = std::make_shared<entity>();
+	gui->get()->mask |= 1 << component::Component::POSITION;
+	gui->get()->mask |= 1 << component::Component::SPRITE;
+	gui->get()->mask |= 1 << component::Component::STATS;
+	gui->get()->mask |= 1 << component::Component::GUI;
+	gui->get()->pos = std::make_shared<component::position>(0, 0);
+	gui->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), nullptr);
+	gui->get()->stat = player->get()->stat;
+	e.add_entity(gui);
+}
+
+entity_ptr create_cave(engine& e)
+{
+	entity_ptr cave = std::make_shared<entity>();
+	cave->get()->mask |= 1 << component::Component::POSITION;
+	cave->get()->mask |= 1 << component::Component::SPRITE;
+	cave->get()->mask |= 1 << component::Component::MAP;
+	cave->get()->mask |= 1 << component::Component::COLLISION;
+	cave->get()->map = std::make_shared<component::mapgrid>(json::parse_from_file("data/levels/cave/cave25.cfg"));
+	cave->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), make_surface_from_map(cave->get()->map->map));
+	cave->get()->pos = std::make_shared<component::position>(0,0);
+	e.add_entity(cave);
+	e.set_camera(cave->get()->map->start);
+	return cave;
+}
+
+void create_goblin(engine& e)
+{
+	entity_ptr mob = std::make_shared<entity>();
+	// Player component simply acts as a tag for the entity
+	font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
+	mob->get()->mask |= 1 << component::Component::ENEMY;
+	mob->get()->mask |= 1 << component::Component::AI;
+	mob->get()->mask |= 1 << component::Component::POSITION;
+	mob->get()->mask |= 1 << component::Component::STATS;
+	mob->get()->mask |= 1 << component::Component::SPRITE;
+	mob->get()->mask |= 1 << component::Component::COLLISION;
+	mob->get()->pos = std::make_shared<component::position>(23, 4);
+	mob->get()->stat = std::make_shared<component::stats>(2);
+	mob->get()->ai = std::make_shared<component::ai>();
+	auto surf = font::render_shaded("g", fnt, graphics::color(0,96,16), graphics::color(0,0,0));
+	mob->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), surf);
+	e.add_entity(mob);
+}
 
 int main(int argc, char* argv[])
 {
@@ -166,18 +246,28 @@ int main(int argc, char* argv[])
 		uint64_t render_acc = 0;
 		int render_cnt = 0;
 
-		glm::mat4 ui_camera = glm::ortho(0.0f, float(width), float(height), 0.0f);
-		glm::mat4 scene_camera = glm::ortho(0.0f, float(width), float(height), 0.0f);;
-
-		graphics::render::manager render_manager;
 		font::manager font_manager;
 
-		engine e;
-		entity_ptr player = std::make_shared<entity>();
-		player->add(std::make_shared<position_component>(0, 0));
-		// display component should take a texture used to display the player.
-		player->add(std::make_shared<display_component>());
-		e.add_entity(player);
+		// Get some metrics about display size and font size to calculate how much we're showing at once.
+		auto fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
+		// Because this is a monospaced font, we can grab the size for one character and it will be the 
+		// same for all.
+		int cw, ch;
+		font::get_text_size(fnt, "X", &cw, &ch);
+		LOG_INFO("Tile Size: (" << cw << "," << ch << ")");
+
+		// XX engine should take the renderer as a parameter, expose it as a get function, then pass itself
+		// to the update function.
+		engine e(wm);
+		auto cave = create_cave(e);
+		create_player(e, cave->get()->map->start);
+		create_goblin(e);
+		e.add_process(std::make_shared<process::movement>());
+		e.add_process(std::make_shared<process::input>());
+		e.add_process(std::make_shared<process::render>());
+		e.add_process(std::make_shared<process::controller>());
+		e.add_process(std::make_shared<process::gui>());
+		e.add_process(std::make_shared<process::collision>());
 
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();
@@ -185,20 +275,14 @@ int main(int argc, char* argv[])
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			running = process_events();
 			frame_processing_time = SDL_GetTicks() - cycle_start_tick;
 
-			// Draw here
-			//graphics::render::set_p_matrix(ortho_camera);
-			//graphics::render::set_mv_matrix(glm::mat4(1.0f));
-			//auto tex = graphics::texture::get("images/noise1.png");
-			//graphics::render::blit_2d_texture(tex, 0, 0, 800, 600);
-			draw_stuff(scene_camera);
+			SDL_RenderClear(wm.get_renderer());
+			running = e.update(60.0/1000.0);
+			SDL_RenderPresent(wm.get_renderer());
 			
 			frame_render_time = SDL_GetTicks() - frame_processing_time - cycle_start_tick;
-			draw_ui(ui_camera);
-
-			wm.swap();
+			//draw_ui(ui_camera);
 
 			Uint32 delay = SDL_GetTicks() - cycle_start_tick;
 			render_acc += delay;
@@ -218,8 +302,6 @@ int main(int argc, char* argv[])
 				SDL_Delay(FRAME_RATE - delay);
 			}
 		}
-
-
 
 	} catch(std::exception& e) {
 		std::cerr << e.what();

@@ -114,7 +114,7 @@ namespace graphics
 
 	void window_manager::swap() 
 	{
-		SDL_GL_SwapWindow(window_);
+		SDL_GL_SwapWindow(window_);		
 	}
 
 	window_manager::~window_manager()

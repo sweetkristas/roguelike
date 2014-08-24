@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <memory>
 
 #include "component.hpp"
 
@@ -9,11 +9,9 @@ class entity
 public:
 	entity();
 	~entity();
-	void add(component_ptr);
-	void remove(component_ptr);
-	component_ptr get(const std::string& id);
+	component::component_set_ptr get() { return components_; }
 private:
-	std::map<std::string, component_ptr> components_;
+	component::component_set_ptr components_;
 };
 
 typedef std::shared_ptr<entity> entity_ptr;

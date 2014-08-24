@@ -194,6 +194,18 @@ const node_list& node::as_list() const
 	return l_;
 }
 
+std::vector<std::string> node::as_list_strings() const
+{
+	std::vector<std::string> res;
+	ASSERT_LOG(type() == NODE_TYPE_LIST, "as_list_strings() type conversion error from " << type_as_string() << " to list");
+	res.reserve(l_.size());
+	for(auto& n : l_) {
+		ASSERT_LOG(n.is_string(), "type conversion error from " << type_as_string() << " to string");
+		res.emplace_back(n.as_string());
+	}
+	return res;
+}
+
 const node_map& node::as_map() const
 {
 	ASSERT_LOG(type() == NODE_TYPE_MAP, "as_map() type conversion error from " << type_as_string() << " to map");
