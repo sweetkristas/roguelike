@@ -5,12 +5,12 @@
 #include "unit_test.hpp"
 
 node::node()
-	: type_(NODE_TYPE_NULL), i_(0), f_(0.0f), b_(false)
+	: type_(NODE_TYPE_NULL), b_(false), i_(0), f_(0.0f)
 {
 }
 
 node::node(const node& rhs) 
-	: type_(rhs.type()), i_(0), f_(0.0f), b_(false)
+	: type_(rhs.type()), b_(false), i_(0), f_(0.0f)
 {
 	switch(type_) {
 	case NODE_TYPE_NULL:				 break;
@@ -27,47 +27,47 @@ node::node(const node& rhs)
 }
 
 node::node(int64_t n)
-	: type_(NODE_TYPE_INTEGER), i_(n), f_(0.0f), b_(false)
+	: type_(NODE_TYPE_INTEGER), b_(false), i_(n), f_(0.0f)
 {
 }
 
 node::node(int n)
-	: type_(NODE_TYPE_INTEGER), i_(n), f_(0.0f), b_(false)
+	: type_(NODE_TYPE_INTEGER), b_(false), i_(n), f_(0.0f)
 {
 }
 
 node::node(unsigned n)
-	: type_(NODE_TYPE_INTEGER), i_(n), f_(0.0f), b_(false)
+	: type_(NODE_TYPE_INTEGER), b_(false), i_(n), f_(0.0f)
 {
 }
 
 node::node(float f)
-	: type_(NODE_TYPE_FLOAT), i_(0), f_(f), b_(false)
+	: type_(NODE_TYPE_FLOAT), b_(false), i_(0), f_(f)
 {
 }
 
 node::node(double f)
-: type_(NODE_TYPE_FLOAT), i_(0), f_(static_cast<float>(f)), b_(false)
+: type_(NODE_TYPE_FLOAT), b_(false), i_(0), f_(static_cast<float>(f))
 {
 }
 
 node::node(const std::string& s)
-	: type_(NODE_TYPE_STRING), i_(0), f_(0.0f), s_(s), b_(false)
+	: type_(NODE_TYPE_STRING), b_(false), i_(0), f_(0.0f), s_(s)
 {
 }
 
 node::node(const char* s)
-	: type_(NODE_TYPE_STRING), i_(0), f_(0.0f), s_(s), b_(false)
+	: type_(NODE_TYPE_STRING), b_(false), i_(0), f_(0.0f), s_(s)
 {
 }
 
 node::node(const std::map<node,node>& m)
-	: type_(NODE_TYPE_MAP), i_(0), f_(0.0f), m_(m), b_(false)
+	: type_(NODE_TYPE_MAP), b_(false), i_(0), f_(0.0f), m_(m)
 {
 }
 
 node::node(const std::vector<node>& l)
-	: type_(NODE_TYPE_LIST), i_(0), f_(0.0f), l_(l), b_(false)
+	: type_(NODE_TYPE_LIST), b_(false), i_(0), f_(0.0f), l_(l)
 {
 }
 
@@ -116,6 +116,7 @@ std::string node::type_as_string() const
 		return "list";
 	case NODE_TYPE_FUNCTION:
 		return "function";
+	default: break;
 	}
 	ASSERT_LOG(false, "Unrecognised type converting to string: " << type_);
 }
@@ -129,6 +130,7 @@ int64_t node::as_int() const
 		return int64_t(f_);
 	case NODE_TYPE_BOOL:
 		return b_ ? 1 : 0;
+	default: break;
 	}
 	ASSERT_LOG(false, "as_int() type conversion error from " << type_as_string() << " to int");
 	return 0;
@@ -149,6 +151,7 @@ std::string node::as_string() const
 		s << f_;
 		return s.str();
 	}
+	default: break;
 	}
 	ASSERT_LOG(false, "as_string() type conversion error from " << type_as_string() << " to string");
 	return "";
@@ -163,6 +166,7 @@ float node::as_float() const
 		return f_;
 	case NODE_TYPE_BOOL:
 		return b_ ? 1.0f : 0.0f;
+	default: break;
 	}
 	ASSERT_LOG(false, "as_float() type conversion error from " << type_as_string() << " to float");
 	return 0;
@@ -183,6 +187,7 @@ bool node::as_bool() const
 		return l_.empty() ? false : true;
 	case NODE_TYPE_MAP:
 		return m_.empty() ? false : true;
+	default: break;
 	}
 	ASSERT_LOG(false, "as_bool() type conversion error from " << type_as_string() << " to boolean");
 	return 0;
@@ -258,8 +263,7 @@ bool node::operator<(const node& n) const
 		}
 		return l_.size() < n.l_.size();
 	case NODE_TYPE_FUNCTION:
-	default:
-		break;
+	default: break;
 	}
 	ASSERT_LOG(false, "operator< unknown type: " << type_as_string());
 	return false;
@@ -372,6 +376,7 @@ bool node::operator==(const node& n) const
 			}
 		}
 		return true;
+	default: break;
 	}
 	return false;
 
@@ -455,6 +460,7 @@ void node::write_json(std::ostream& os, bool pretty, int indent) const
 		}
 		os << pretty ? "\n" + std::string(' ', indent) + "]" : "]";
 		break;
+	default: break;
 	}
 }
 
