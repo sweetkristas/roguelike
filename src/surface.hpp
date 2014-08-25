@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics.hpp"
+#include "SDL.h"
 #include "ref_counted_ptr.hpp"
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN

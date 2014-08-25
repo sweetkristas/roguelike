@@ -27,7 +27,6 @@ objects = \
 	src/obj_reader.o \
 	src/process.o \
 	src/render_process.o \
-	src/shaders.o \
 	src/surface.o \
 	src/texture.o \
 	src/unit_test.o \

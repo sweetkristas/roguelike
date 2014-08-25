@@ -1,7 +1,6 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include "graphics.hpp"
 #include "profile_timer.hpp"
 #include "sdl_wrapper.hpp"
 #include "wm.hpp"
@@ -92,6 +91,7 @@ namespace graphics
 	{
 		profile::manager prof("SDL_GL_CreateContext");
 		glcontext_ = SDL_GL_CreateContext(window_);
+		/*
 
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
@@ -103,7 +103,7 @@ namespace graphics
 		glViewport(0, 0, GLsizei(width_), GLsizei(height_));
 
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
+		*/
 		// Enable depth test
 		//glEnable(GL_DEPTH_TEST);
 		// Accept fragment if it closer to the camera than the former one
@@ -114,7 +114,7 @@ namespace graphics
 
 	void window_manager::swap() 
 	{
-		SDL_GL_SwapWindow(window_);		
+		//SDL_GL_SwapWindow(window_);		
 	}
 
 	window_manager::~window_manager()

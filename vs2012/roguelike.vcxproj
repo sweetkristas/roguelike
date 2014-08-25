@@ -22,7 +22,6 @@
     <ClCompile Include="..\src\filesystem.cpp" />
     <ClCompile Include="..\src\font.cpp" />
     <ClCompile Include="..\src\generate_cave.cpp" />
-    <ClCompile Include="..\src\GLee.c" />
     <ClCompile Include="..\src\gui_process.cpp" />
     <ClCompile Include="..\src\input_process.cpp" />
     <ClCompile Include="..\src\json.cpp" />
@@ -32,7 +31,6 @@
     <ClCompile Include="..\src\node_utils.cpp" />
     <ClCompile Include="..\src\notify.cpp" />
     <ClCompile Include="..\src\render_process.cpp" />
-    <ClCompile Include="..\src\shaders.cpp" />
     <ClCompile Include="..\src\process.cpp" />
     <ClCompile Include="..\src\unit_test.cpp" />
     <ClCompile Include="..\src\wm.cpp" />
@@ -52,7 +50,6 @@
     <ClInclude Include="..\src\font.hpp" />
     <ClInclude Include="..\src\generate_cave.hpp" />
     <ClInclude Include="..\src\geometry.hpp" />
-    <ClInclude Include="..\src\GLee.h" />
     <ClInclude Include="..\src\graphics.hpp" />
     <ClInclude Include="..\src\gui_process.hpp" />
     <ClInclude Include="..\src\hasher.hpp" />
@@ -66,7 +63,6 @@
     <ClInclude Include="..\src\ref_counted_ptr.hpp" />
     <ClInclude Include="..\src\render_process.hpp" />
     <ClInclude Include="..\src\sdl_wrapper.hpp" />
-    <ClInclude Include="..\src\shaders.hpp" />
     <ClInclude Include="..\src\process.hpp" />
     <ClInclude Include="..\src\unit_test.hpp" />
     <ClInclude Include="..\src\wm.hpp" />

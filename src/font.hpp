@@ -2,8 +2,10 @@
 
 #include <memory>
 
+#include "SDL.h"
+#include "SDL_ttf.h"
+
 #include "color.hpp"
-#include "graphics.hpp"
 #include "surface.hpp"
 
 namespace font
