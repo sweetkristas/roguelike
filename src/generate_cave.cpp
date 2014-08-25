@@ -44,7 +44,7 @@ namespace generator
 	{
 		const int w = static_cast<int>(cave[0].size());
 		const int h = static_cast<int>(cave.size());
-		if(y < 0 || y >= h || x < 0 || x >= h) {
+		if(y < 0 || y >= h || x < 0 || x >= w) {
 			if(sym == CaveSymbols::WALL) {
 				return 1;
 			}

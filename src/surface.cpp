@@ -1,3 +1,5 @@
+#include "SDL_image.h"
+
 #include "asserts.hpp"
 #include "surface.hpp"
 

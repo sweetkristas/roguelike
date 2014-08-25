@@ -1,6 +1,5 @@
 #pragma once
 
-#include "graphics.hpp"
 #include "ref_counted_ptr.hpp"
 #include "surface.hpp"
 

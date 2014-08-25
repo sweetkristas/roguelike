@@ -24,10 +24,7 @@ objects = \
 	src/node.o \
 	src/node_utils.o \
 	src/notify.o \
-	src/obj_reader.o \
 	src/process.o \
 	src/render_process.o \
-	src/surface.o \
-	src/texture.o \
 	src/unit_test.o \
 	src/wm.o

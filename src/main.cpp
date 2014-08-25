@@ -190,7 +190,7 @@ void create_goblin(engine& e)
 	mob->get()->mask |= 1 << component::Component::COLLISION;
 	mob->get()->pos = std::make_shared<component::position>(23, 4);
 	mob->get()->stat = std::make_shared<component::stats>(2);
-	mob->get()->ai = std::make_shared<component::ai>();
+	mob->get()->aip = std::make_shared<component::ai>();
 	auto surf = font::render_shaded("g", fnt, graphics::color(0,96,16), graphics::color(0,0,0));
 	mob->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), surf);
 	e.add_entity(mob);
@@ -240,9 +240,6 @@ int main(int argc, char* argv[])
 		wm.gl_init();
 
 		bool running = true;
-		Uint32 start_time = SDL_GetTicks();
-		uint64_t render_acc = 0;
-		int render_cnt = 0;
 
 		font::manager font_manager;
 
@@ -276,7 +273,6 @@ int main(int argc, char* argv[])
 
 			SDL_RenderClear(wm.get_renderer());
 			running = e.update(60.0/1000.0);
-			Uint32 update_time = SDL_GetTicks() - cycle_start_tick;
 			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
 	

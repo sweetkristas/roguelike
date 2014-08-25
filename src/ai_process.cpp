@@ -34,7 +34,7 @@ namespace process
 			case SDL_USEREVENT:
 				if(evt.user.code == static_cast<Sint32>(EngineUserEvents::NEW_TURN)) {
 					should_update_ = true;
-					update_turns_ = reinterpret_cast<int>(evt.user.data1);
+					update_turns_ = *static_cast<int*>(evt.user.data1);
 				}
 			default: break;
 		}
@@ -54,7 +54,7 @@ namespace process
 
 			if((e->get()->mask & ai_mask) == ai_mask) {
 				auto& pos = e->get()->pos;
-				auto& aip = e->get()->ai;
+				//auto& aip = e->get()->aip;
 			
 				// XXX this should be rate limited a bit, so if the player wanted
 				// to do something for 20 turns then we carry out 1 turn/200ms or so

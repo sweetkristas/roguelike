@@ -25,9 +25,6 @@ namespace process
 			| (1 << component::Component::POSITION)
 			| (1 << component::Component::SPRITE);
 		
-		const point& cam = eng.get_camera();
-		const point& ts = eng.get_tile_size();
-
 		for(auto& e : elist) {
 			if((e->get()->mask & gui_mask) == gui_mask) {
 				auto& stats = e->get()->stat;

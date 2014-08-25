@@ -93,7 +93,7 @@ namespace geometry
 	template<typename T> inline
 	bool operator<(const Point<T>& a, const Point<T>& b)
 	{
-		return a.x < b.x || a.x == b.x && a.y < b.y;
+		return (a.x < b.x) || (a.x == b.x && a.y < b.y);
 	}
 
 	template<typename T> inline

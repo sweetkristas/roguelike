@@ -136,7 +136,7 @@ namespace component
 		std::shared_ptr<position> pos;
 		std::shared_ptr<sprite> spr;
 		std::shared_ptr<stats> stat;
-		std::shared_ptr<ai> ai;
+		std::shared_ptr<ai> aip;
 		std::shared_ptr<input> inp;
 		std::shared_ptr<mapgrid> map;
 		bool is_player() { return (mask & genmask(Component::PLAYER)) == genmask(Component::PLAYER); }

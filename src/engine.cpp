@@ -6,10 +6,10 @@
 #include "profile_timer.hpp"
 
 engine::engine(graphics::window_manager& wm)
-	: wm_(wm),
+	: state_(EngineState::PLAY),
 	  turns_(1),
-	  entity_quads_(0, rect(0,0,100,100)),
-	  state_(EngineState::PLAY)
+	  wm_(wm),
+	  entity_quads_(0, rect(0,0,100,100))
 {
 }
 

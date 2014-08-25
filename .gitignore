@@ -20,6 +20,9 @@
 *.out
 *.app
 
+# Dependency files
+*.d
+
 # msvc files we definitely do not want
 *.sdf
 *.tlog
