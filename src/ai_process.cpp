@@ -34,7 +34,7 @@ namespace process
 			case SDL_USEREVENT:
 				if(evt.user.code == static_cast<Sint32>(EngineUserEvents::NEW_TURN)) {
 					should_update_ = true;
-					update_turns_ = *static_cast<int*>(evt.user.data1);
+					update_turns_ = static_cast<int>(reinterpret_cast<intptr_t>(evt.user.data1));
 				}
 			default: break;
 		}

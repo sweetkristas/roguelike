@@ -34,5 +34,6 @@ namespace test {
 	namespace test {    \
 	void TEST_##name(); \
 	static int TEST_VAR_##name = test::register_test(#name, TEST_##name); \
+	void debug_fn_##name() { std::cerr << TEST_VAR_##name << "\n"; } \
     }                   \
 	void test::TEST_##name()

@@ -81,7 +81,7 @@ roguelike: $(objects) $(ogl_objects) $(sdl_objects) $(ogl_fixed_objects)
 	@$(CCACHE) $(CXX) \
 		$(BASE_CXXFLAGS) $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INC) \
 		$(objects) $(ogl_objects) $(sdl_objects) $(ogl_fixed_objects) -o roguelike \
-		$(LIBS) -lboost_regex -lboost_system -lboost_filesystem -lpthread -fthreadsafe-statics
+		$(LIBS) -lboost_regex -lboost_system -lboost_filesystem -lboost_thread -fthreadsafe-statics
 
 # pull in dependency info for *existing* .o files
 -include $(objects:.o=.d)

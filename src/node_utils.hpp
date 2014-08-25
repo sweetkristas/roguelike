@@ -36,12 +36,12 @@ private:
 };
 
 
-template<> node_builder& node_builder::add(const std::string& name, const node& value)
+template<> inline node_builder& node_builder::add(const std::string& name, const node& value)
 {
 	return add_value(name, value);
 }
 
-template<> node_builder& node_builder::add(const std::string& name, node& value)
+template<> inline node_builder& node_builder::add(const std::string& name, node& value)
 {
 	return add_value(name, value);
 }

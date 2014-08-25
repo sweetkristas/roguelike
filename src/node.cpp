@@ -72,19 +72,19 @@ node::node(const std::vector<node>& l)
 }
 
 node::node(node_map* m)
-	: type_(NODE_TYPE_MAP), i_(0), f_(0.0f), b_(false)
+	: type_(NODE_TYPE_MAP), b_(false), i_(0), f_(0.0f)
 {
 	m_.swap(*m);
 }
 
 node::node(node_list* l)
-	: type_(NODE_TYPE_LIST), i_(0), f_(0.0f), b_(false)
+	: type_(NODE_TYPE_LIST), b_(false), i_(0), f_(0.0f)
 {
 	l_.swap(*l);
 }
 
 node::node(node_fn fn)
-	: type_(NODE_TYPE_FUNCTION), i_(0), f_(0.0f), b_(false), fn_(fn)
+	: type_(NODE_TYPE_FUNCTION), b_(false), i_(0), f_(0.0f), fn_(fn)
 {
 }
 
@@ -254,7 +254,7 @@ bool node::operator<(const node& n) const
 	case NODE_TYPE_MAP:
 		return m_.size() < n.m_.size();
 	case NODE_TYPE_LIST:
-		for(int i = 0; i != l_.size() && i != n.l_.size(); ++i) {
+		for(unsigned i = 0; i != l_.size() && i != n.l_.size(); ++i) {
 			if(l_[i] < n.l_[i]) {
 				return true;
 			} else if(l_[i] > n.l_[i]) {
@@ -317,7 +317,7 @@ node node::operator()(node args)
 bool node::has_key(const node& v) const
 {
 	if(type() == NODE_TYPE_LIST) {
-		return v.as_int() < l_.size() ? true : false;
+		return static_cast<size_t>(v.as_int()) < l_.size() ? true : false;
 	} else if(type() == NODE_TYPE_MAP) {
 		return m_.find(v) != m_.end() ? true : false;
 	} else {
@@ -346,7 +346,7 @@ bool node::operator==(const node& n) const
 {
 	if(type() != n.type()) {
 		if(type() == NODE_TYPE_FLOAT || n.type() == NODE_TYPE_FLOAT) {
-			if(!is_numeric() && !is_null() || !n.is_numeric() && !n.is_null()) {
+			if((!is_numeric() && !is_null()) || (!n.is_numeric() && !n.is_null())) {
 				return false;
 			}
 			return is_numeric() == n.is_numeric();
@@ -394,7 +394,7 @@ void node::write_json(std::ostream& os, bool pretty, int indent) const
 		os << "null";
 		break;
 	case NODE_TYPE_BOOL:
-		os << b_ ? "true" : "false";
+		os << (b_ ? "true" : "false");
 		break;
 	case NODE_TYPE_INTEGER:
 		os << i_;
@@ -446,7 +446,7 @@ void node::write_json(std::ostream& os, bool pretty, int indent) const
 				os << pretty ? ",\n" + std::string(' ', indent) : ",";
 			}
 			pr->first.write_json(os, pretty, indent + 4);
-			os << pretty ? ": " : ":";
+			os << (pretty ? ": " : ":");
 			pr->second.write_json(os, pretty, indent + 4);
 		}
 		os << pretty ? "\n" + std::string(' ', indent) + "}" : "}";
