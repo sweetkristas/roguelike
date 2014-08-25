@@ -1,0 +1,34 @@
+#
+# This file contains lists of object files for our build targets.
+# Please keep every file in separate lines to make diff and patching easier.
+#
+
+# Game engine
+objects = \
+	src/ai_process.o \
+	src/collision_process.o \
+	src/color.o \
+	src/component.o \
+	src/controller_process.o \
+	src/datetime.o \
+	src/engine.o \
+	src/entity.o \
+	src/filesystem.o \
+	src/font.o \
+	src/generate_cave.o \
+	src/gui_process.o \
+	src/input_process.o \
+	src/json.o \
+	src/main.o \
+	src/map.o \
+	src/node.o \
+	src/node_utils.o \
+	src/notify.o \
+	src/obj_reader.o \
+	src/process.o \
+	src/render_process.o \
+	src/shaders.o \
+	src/surface.o \
+	src/texture.o \
+	src/unit_test.o \
+	src/wm.o

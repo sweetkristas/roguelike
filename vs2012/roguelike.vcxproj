@@ -16,6 +16,7 @@
     <ClCompile Include="..\src\color.cpp" />
     <ClCompile Include="..\src\component.cpp" />
     <ClCompile Include="..\src\controller_process.cpp" />
+    <ClCompile Include="..\src\datetime.cpp" />
     <ClCompile Include="..\src\engine.cpp" />
     <ClCompile Include="..\src\entity.cpp" />
     <ClCompile Include="..\src\filesystem.cpp" />
@@ -43,6 +44,7 @@
     <ClInclude Include="..\src\color.hpp" />
     <ClInclude Include="..\src\component.hpp" />
     <ClInclude Include="..\src\controller_process.hpp" />
+    <ClInclude Include="..\src\datetime.hpp" />
     <ClInclude Include="..\src\dir_monitor.hpp" />
     <ClInclude Include="..\src\engine.hpp" />
     <ClInclude Include="..\src\entity.hpp" />
@@ -123,7 +125,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Projects\boost;C:\Projects\SDL\include;C:\Projects\SDL_image;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\roguelike\include;C:\Projects\assimp-3.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -141,7 +143,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

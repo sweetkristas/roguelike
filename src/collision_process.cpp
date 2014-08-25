@@ -80,7 +80,7 @@ namespace process
 						}
 						for(auto& exitp : e1map->exits) {
 							if(e2pos->p == exitp) {
-								if(e1->get()->is_player()) {
+								if(e2->get()->is_player()) {
 									// XXX do some exit logic, quitting the game for now
 									eng.set_state(EngineState::QUIT);
 								} else {

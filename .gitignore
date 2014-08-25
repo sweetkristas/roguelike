@@ -31,6 +31,7 @@
 *.suo
 *.user
 *.unsuccessfulbuild
+*.opensdf
 vs2013/Debug
 vs2013/Release
 vs2012/Debug
