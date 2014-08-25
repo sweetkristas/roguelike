@@ -16,6 +16,10 @@ enum class EngineState {
 	QUIT,
 };
 
+enum class EngineUserEvents {
+	NEW_TURN = 1,
+};
+
 class engine
 {
 public:
@@ -38,20 +42,25 @@ public:
 	bool update(double time);
 
 	int get_turns() const { return turns_; }
-	void inc_turns() { ++turns_; }
+	void inc_turns(int cnt = 1);
 
-	void set_camera(const point& cam) { camera_ = cam; }
-	const point& get_camera() { return camera_; }
+	void set_camera(const std::shared_ptr<component::position>& cam) { camera_ = cam; }
+	const point& get_camera();
 
 	std::vector<entity_ptr> entities_in_area(const rect& r);
+
+	const point& get_tile_size() const { return tile_size_; }
+	void set_tile_size(const point& p) { tile_size_ = p; }
+
 private:
 	void process_events();
 	void populate_quadtree();
 	EngineState state_;
 	int turns_;
-	point camera_;
+	std::shared_ptr<component::position> camera_;
 	graphics::window_manager& wm_;
 	std::vector<entity_ptr> entity_list_;
 	quadtree<entity_ptr> entity_quads_;
 	std::vector<process::process_ptr> process_list_;
+	point tile_size_;
 };

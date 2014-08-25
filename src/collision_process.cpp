@@ -19,10 +19,10 @@ namespace process
 	void ee_collision::update(engine& eng, double t, const std::vector<entity_ptr>& elist)
 	{
 		static component_id collision_mask 
-			= (1 << component::Component::POSITION)
-			| (1 << component::Component::SPRITE)
-			| (1 << component::Component::COLLISION);
-		static component_id collision_map_mask = collision_mask | (1 << component::Component::MAP);
+			= component::genmask(component::Component::POSITION)
+			| component::genmask(component::Component::SPRITE)
+			| component::genmask(component::Component::COLLISION);
+		static component_id collision_map_mask = collision_mask | component::genmask(component::Component::MAP);
 		// O(n^2) collision testing is for the pro's :-/
 		// XXX Please make quad-tree or kd-tree for O(nlogn)
 		for(auto& e1 : elist) {
@@ -58,23 +58,21 @@ namespace process
 	void em_collision::update(engine& eng, double t, const std::vector<entity_ptr>& elist)
 	{
 		static component_id collision_mask 
-			= (1 << component::Component::POSITION)
-			| (1 << component::Component::SPRITE)
-			| (1 << component::Component::COLLISION);
-		static component_id collision_map_mask = collision_mask | (1 << component::Component::MAP);
+			= component::genmask(component::Component::COLLISION)
+			| component::genmask(component::Component::POSITION);
 		static component_id  map_mask
-			= (1 << component::Component::COLLISION) 
-			| (1 << component::Component::MAP);
+			= component::genmask(component::Component::COLLISION)
+			| component::genmask(component::Component::MAP);
 		// O(n^2) collision testing is for the pro's :-/
 		// XXX Please make quad-tree or kd-tree for O(nlogn)
 		for(auto& e1 : elist) {
-			if((e1->get()->mask & collision_map_mask) == collision_map_mask) {
+			if((e1->get()->mask & map_mask) == map_mask) {
 				auto& e1map = e1->get()->map;
 				for(auto& e2 : elist) {
 					if(e1 == e2) {
 						continue;
 					}
-					if((e2->get()->mask & collision_map_mask) == collision_mask) {
+					if((e2->get()->mask & (collision_mask | (1 << component::Component::MAP))) == collision_mask) {
 						auto& e2pos = e2->get()->pos;
 						// entity - map collision
 						if(!is_passable(e1map->map[e2pos->p.y][e2pos->p.x])) {
@@ -82,8 +80,13 @@ namespace process
 						}
 						for(auto& exitp : e1map->exits) {
 							if(e2pos->p == exitp) {
-								// XXX do some exit logic
-								eng.set_state(EngineState::QUIT);
+								if(e1->get()->is_player()) {
+									// XXX do some exit logic, quitting the game for now
+									eng.set_state(EngineState::QUIT);
+								} else {
+									// don't let the non-player controlled entities leave via exit
+									e2pos->p = e2pos->last_p;
+								}
 							}
 						}
 					} 

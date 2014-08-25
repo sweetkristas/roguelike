@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "datetime.hpp"
 #include "engine.hpp"
 #include "font.hpp"
 #include "gui_process.hpp"
@@ -18,12 +19,16 @@ namespace process
 
 	void gui::update(engine& eng, double t, const std::vector<entity_ptr>& elist)
 	{
+		static component_id gui_mask
+			= (1 << component::Component::GUI)
+			| (1 << component::Component::STATS)
+			| (1 << component::Component::POSITION)
+			| (1 << component::Component::SPRITE);
+		
+		const point& cam = eng.get_camera();
+		const point& ts = eng.get_tile_size();
+
 		for(auto& e : elist) {
-			static component_id gui_mask
-				= (1 << component::Component::GUI) 
-				| (1 << component::Component::STATS)
-				| (1 << component::Component::POSITION)
-				| (1 << component::Component::SPRITE);
 			if((e->get()->mask & gui_mask) == gui_mask) {
 				auto& stats = e->get()->stat;
 				auto& pos = e->get()->pos;
@@ -35,11 +40,14 @@ namespace process
 				ss  << "Turn: " << std::setw(4) << eng.get_turns()
 					<< " | "
 					<< "Health: " << stats->health
+					<< " | "
+					<< datetime(eng.get_turns()).printable()
 					;
 				auto surf = font::render_shaded(ss.str(), fnt, graphics::color(255,255,255), graphics::color(0,0,0));
 				// surface gets free'd by update_texture, so we need to get height (and width if needed) before we call it.
+				// gui tagged entities get absolute pixel positioning for *free*.
 				pos->p.x = 0;
-				pos->p.y = (eng.get_window().height() - surf->h) / surf->h;
+				pos->p.y = eng.get_window().height() - surf->h;
 				spr->update_texture(eng.get_renderer(), surf);
 			}
 		}

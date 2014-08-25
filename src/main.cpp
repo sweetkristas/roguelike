@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "ai_process.hpp"
 #include "asserts.hpp"
 #include "collision_process.hpp"
 #include "controller_process.hpp"
@@ -43,19 +44,17 @@ void sdl_gl_setup()
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 }
 
-namespace
+void draw_perf_stats(engine& eng, double update_time)
 {
-	int frame_render_time;
-	int frame_processing_time;
-}
-
-void draw_ui(const glm::mat4& ortho_camera)
-{
-//	std::stringstream ss1, ss2;
-//	ss1 << "Frame draw time (uS): " << std::fixed << frame_render_time;
-//	auto r = graphics::render::text::quick_draw(0, 600-40, ss1.str(), "SourceCodePro-Regular.ttf", 14, graphics::color(1.0f, 1.0f, 0.5f));
-//	ss2 << "Frame process time (uS): " << std::fixed << frame_processing_time;
-//	graphics::render::text::quick_draw(0, r.y2(), ss2.str(), "SourceCodePro-Regular.ttf", 14, graphics::color(1.0f, 1.0f, 0.5f));
+	font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
+	std::stringstream ss1;
+	ss1 << "Frame update time (uS): " << std::fixed << update_time;
+	auto surf = font::render_shaded(ss1.str(), fnt, graphics::color(1.0f, 1.0f, 0.5f), graphics::color(0,0,0));
+	auto tex = SDL_CreateTextureFromSurface(eng.get_renderer(), surf);
+	SDL_Rect dst = {0, 0, surf->w, surf->h};
+	SDL_RenderCopy(eng.get_renderer(), tex, NULL, &dst);
+	SDL_FreeSurface(surf);
+	SDL_DestroyTexture(tex);
 }
 
 /*node get_cave_params()
@@ -146,6 +145,7 @@ void create_player(engine& e, const point& start)
 	player->get()->mask |= 1 << component::Component::SPRITE;
 	player->get()->mask |= 1 << component::Component::COLLISION;
 	player->get()->pos = std::make_shared<component::position>(start);
+	e.set_camera(player->get()->pos);
 	player->get()->stat = std::make_shared<component::stats>(10);
 	player->get()->inp = std::make_shared<component::input>();
 	auto surf = font::render_shaded("@", fnt, graphics::color(255,255,255), graphics::color(255,0,0));
@@ -167,7 +167,6 @@ void create_player(engine& e, const point& start)
 entity_ptr create_cave(engine& e)
 {
 	entity_ptr cave = std::make_shared<entity>();
-	cave->get()->mask |= 1 << component::Component::POSITION;
 	cave->get()->mask |= 1 << component::Component::SPRITE;
 	cave->get()->mask |= 1 << component::Component::MAP;
 	cave->get()->mask |= 1 << component::Component::COLLISION;
@@ -175,7 +174,6 @@ entity_ptr create_cave(engine& e)
 	cave->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), make_surface_from_map(cave->get()->map->map));
 	cave->get()->pos = std::make_shared<component::position>(0,0);
 	e.add_entity(cave);
-	e.set_camera(cave->get()->map->start);
 	return cave;
 }
 
@@ -267,35 +265,33 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::render>());
 		e.add_process(std::make_shared<process::controller>());
 		e.add_process(std::make_shared<process::gui>());
+		e.add_process(std::make_shared<process::ai>());
 		e.add_process(std::make_shared<process::em_collision>());
 		e.add_process(std::make_shared<process::ee_collision>());
+		e.set_tile_size(point(cw, ch));
 
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();
-
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			frame_processing_time = SDL_GetTicks() - cycle_start_tick;
+			profile::timer tm;
 
 			SDL_RenderClear(wm.get_renderer());
 			running = e.update(60.0/1000.0);
+			Uint32 update_time = SDL_GetTicks() - cycle_start_tick;
+			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
-			
-			frame_render_time = SDL_GetTicks() - frame_processing_time - cycle_start_tick;
+	
 			//draw_ui(ui_camera);
 
 			Uint32 delay = SDL_GetTicks() - cycle_start_tick;
-			render_acc += delay;
+			/*render_acc += delay;
 			render_cnt++;
-			Uint32 current_time = SDL_GetTicks();
-			if(current_time - start_time >= 1000) {
+			if(SDL_GetTicks() - start_time >= 1000) {
 				std::cerr << "Average processing time: " << double(render_acc) / double(render_cnt) << " ms " << render_acc << " : " << render_cnt << std::endl;
 
-				start_time = current_time;
+				start_time = SDL_GetTicks();
 				render_cnt = 0;
 				render_acc = 0;
-			}
+			}*/
 
 			if(delay > FRAME_RATE) {
 				//std::cerr << "CYCLE TOO LONG: " << delay << std::endl;

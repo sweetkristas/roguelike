@@ -44,6 +44,12 @@ void engine::remove_process(process::process_ptr s)
 		[&s](process::process_ptr sp) { return sp == s; }), process_list_.end());
 }
 
+const point& engine::get_camera() 
+{ 
+	ASSERT_LOG(camera_ != nullptr, "Dereference null camera.");
+	return camera_->p; 
+}
+
 void engine::process_events()
 {
 	SDL_Event evt;
@@ -123,4 +129,21 @@ bool engine::update(double time)
 	}
 
 	return true;
+}
+
+void engine::inc_turns(int cnt)
+{ 
+	// N.B. The event holds the number turn number before we incremented. 
+	// So we can run things like the AI for the correct number of turns skipped.
+	// XXX On second thoughts I don't like this at all, we should skip
+	// turns at a rate 1/200ms or so I think. Gives player time to cancel
+	// if attacked etc.
+	SDL_Event user_event;
+	user_event.type = SDL_USEREVENT;
+	user_event.user.code = static_cast<Sint32>(EngineUserEvents::NEW_TURN);
+	user_event.user.data1 = reinterpret_cast<void*>(turns_);
+	user_event.user.data2 = nullptr;
+	SDL_PushEvent(&user_event);
+
+	turns_ += cnt;
 }

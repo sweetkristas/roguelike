@@ -40,6 +40,10 @@ namespace component
 	{
 		return component_id(value << static_cast<unsigned long long>(rhs));
 	}
+	inline component_id genmask(const Component& lhs)
+	{
+		return 1 << lhs;
+	}
 
 	class component
 	{
@@ -135,6 +139,8 @@ namespace component
 		std::shared_ptr<ai> ai;
 		std::shared_ptr<input> inp;
 		std::shared_ptr<mapgrid> map;
+		bool is_player() { return (mask & genmask(Component::PLAYER)) == genmask(Component::PLAYER); }
 	};
 	typedef std::shared_ptr<component_set> component_set_ptr;
 }
+

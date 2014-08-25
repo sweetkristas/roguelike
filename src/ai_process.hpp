@@ -10,5 +10,9 @@ namespace process
 		ai();
 		~ai();
 		void update(engine& eng, double t, const std::vector<entity_ptr>& elist);
+	private:
+		bool handle_event(const SDL_Event& evt);
+		bool should_update_;
+		int update_turns_;
 	};
 }
