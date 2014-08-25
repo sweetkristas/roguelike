@@ -280,18 +280,7 @@ int main(int argc, char* argv[])
 			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
 	
-			//draw_ui(ui_camera);
-
 			Uint32 delay = SDL_GetTicks() - cycle_start_tick;
-			/*render_acc += delay;
-			render_cnt++;
-			if(SDL_GetTicks() - start_time >= 1000) {
-				std::cerr << "Average processing time: " << double(render_acc) / double(render_cnt) << " ms " << render_acc << " : " << render_cnt << std::endl;
-
-				start_time = SDL_GetTicks();
-				render_cnt = 0;
-				render_acc = 0;
-			}*/
 
 			if(delay > FRAME_RATE) {
 				//std::cerr << "CYCLE TOO LONG: " << delay << std::endl;
