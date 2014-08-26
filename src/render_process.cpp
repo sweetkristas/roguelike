@@ -31,14 +31,14 @@ namespace process
 				auto& spr = e->get()->spr;
 				auto& pos = e->get()->pos;
 				if(spr->tex != NULL) {
-					SDL_Rect dst = {pos->p.x, pos->p.y, spr->width, spr->height};
+					SDL_Rect dst = {pos->pos.x, pos->pos.y, spr->width, spr->height};
 					SDL_RenderCopy(eng.get_renderer(), spr->tex, NULL, &dst);
 				}
 			}  else if((e->get()->mask & sprite_mask) == sprite_mask) {
 				auto& spr = e->get()->spr;
 				auto& pos = e->get()->pos;
 				if(spr->tex != NULL) {
-					SDL_Rect dst = {screen_centre.x - (cam.x - pos->p.x) * ts.x, screen_centre.y - (cam.y - pos->p.y) * ts.y, spr->width, spr->height};
+					SDL_Rect dst = {screen_centre.x - (cam.x - pos->pos.x) * ts.x, screen_centre.y - (cam.y - pos->pos.y) * ts.y, spr->width, spr->height};
 					SDL_RenderCopy(eng.get_renderer(), spr->tex, NULL, &dst);
 				}
 			} else if((e->get()->mask & map_mask) == map_mask) {

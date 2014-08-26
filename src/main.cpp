@@ -10,10 +10,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "action_proces.hpp"
 #include "ai_process.hpp"
 #include "asserts.hpp"
 #include "collision_process.hpp"
-#include "controller_process.hpp"
 #include "engine.hpp"
 #include "font.hpp"
 #include "generate_cave.hpp"
@@ -250,7 +250,7 @@ void create_player(engine& e, const point& start)
 	gui->get()->mask |= 1 << component::Component::SPRITE;
 	gui->get()->mask |= 1 << component::Component::STATS;
 	gui->get()->mask |= 1 << component::Component::GUI;
-	gui->get()->pos = std::make_shared<component::position>(0, 0);
+	gui->get()->pos = std::make_shared<component::position>();
 	gui->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), nullptr);
 	gui->get()->stat = player->get()->stat;
 	e.add_entity(gui);
@@ -296,7 +296,7 @@ void create_goblin(engine& e)
 	mob->get()->mask |= 1 << component::Component::STATS;
 	mob->get()->mask |= 1 << component::Component::SPRITE;
 	mob->get()->mask |= 1 << component::Component::COLLISION;
-	mob->get()->pos = std::make_shared<component::position>(23, 4);
+	mob->get()->pos = std::make_shared<component::position>(point(23, 4));
 	mob->get()->stat = std::make_shared<component::stats>(2);
 	mob->get()->aip = std::make_shared<component::ai>();
 	auto surf = font::render_shaded("g", fnt, graphics::color(0,96,16), graphics::color(0,0,0));
@@ -376,12 +376,12 @@ int main(int argc, char* argv[])
 		create_world(e, terrain_symbols);
 		create_player(e, point(0, 0));
 		create_goblin(e);
-		e.add_process(std::make_shared<process::movement>());
 		e.add_process(std::make_shared<process::input>());
 		e.add_process(std::make_shared<process::render>());
-		e.add_process(std::make_shared<process::controller>());
 		e.add_process(std::make_shared<process::gui>());
 		e.add_process(std::make_shared<process::ai>());
+		e.add_process(std::make_shared<process::action>());
+		// N.B. entity/map collision needs to come before entity/entity collision
 		e.add_process(std::make_shared<process::em_collision>());
 		e.add_process(std::make_shared<process::ee_collision>());
 

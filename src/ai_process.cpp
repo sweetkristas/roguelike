@@ -60,14 +60,13 @@ namespace process
 				// to do something for 20 turns then we carry out 1 turn/200ms or so
 				// then if the player needed to cancel action they could.
 				// Fortunately we have a useful time parameter t to use.
-				pos->last_p = pos->p;				
 				update_turns_ = eng.get_turns() - update_turns_;
 				for(int n = 0; n != update_turns_; ++n) {
 					// XXX add some logic
 					if(get_random_int(0,1)) {
-						pos->p.x += get_random_int(-1, 1);
+						pos->mov.x += get_random_int(-1, 1);
 					} else {
-						pos->p.y += get_random_int(-1, 1);
+						pos->mov.y += get_random_int(-1, 1);
 					}
 				}
 			}

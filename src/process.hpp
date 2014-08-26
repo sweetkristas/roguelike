@@ -9,13 +9,10 @@ class engine;
 namespace process
 {
 	enum class ProcessPriority {
-		// controller is pretty much the highest of the high, since it let us pause the game,
-		// process events, etc
-		controller		= 1,
 		input			= 100,
-		movement		= 200,
 		ai				= 300,
 		collision		= 700,
+		action			= 800,
 		gui			    = 850,
 		render			= 900
 	};
@@ -39,13 +36,4 @@ namespace process
 	};
 
 	typedef std::shared_ptr<process> process_ptr;
-
-	class movement : public process
-	{
-	public:
-		movement();
-		~movement();
-		void update(engine& eng, double t, const std::vector<entity_ptr>& elist);
-	private:
-	};
 }

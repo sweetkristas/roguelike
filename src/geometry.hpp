@@ -39,7 +39,7 @@ namespace geometry
 		//explicit Point(const variant& v);
 		explicit Point(const std::vector<T>& v);
 		//variant write() const;
-
+		void clear() { x = T(0); y = T(0); }
 		union {
 			struct { T x, y; };
 			T buf[2];
@@ -52,6 +52,8 @@ namespace geometry
 	bool operator!=(const Point<T>& a, const Point<T>& b);
 	template<typename T> inline
 	bool operator<(const Point<T>& a, const Point<T>& b);
+	template<typename T> inline
+	Point<T> operator+(const Point<T>& lhs, const Point<T>& rhs);
 
 	//template<> inline Point<int>::Point(const variant& v)
 	//{

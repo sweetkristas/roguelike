@@ -11,11 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\action_proces.cpp" />
     <ClCompile Include="..\src\ai_process.cpp" />
     <ClCompile Include="..\src\collision_process.cpp" />
     <ClCompile Include="..\src\color.cpp" />
     <ClCompile Include="..\src\component.cpp" />
-    <ClCompile Include="..\src\controller_process.cpp" />
     <ClCompile Include="..\src\datetime.cpp" />
     <ClCompile Include="..\src\engine.cpp" />
     <ClCompile Include="..\src\entity.cpp" />
@@ -29,19 +29,21 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\node.cpp" />
     <ClCompile Include="..\src\node_utils.cpp" />
+    <ClCompile Include="..\src\noiseutils.cpp" />
     <ClCompile Include="..\src\notify.cpp" />
     <ClCompile Include="..\src\render_process.cpp" />
     <ClCompile Include="..\src\process.cpp" />
+    <ClCompile Include="..\src\terrain_generator.cpp" />
     <ClCompile Include="..\src\unit_test.cpp" />
     <ClCompile Include="..\src\wm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\action_proces.hpp" />
     <ClInclude Include="..\src\ai_process.hpp" />
     <ClInclude Include="..\src\basic_dir_monitor.hpp" />
     <ClInclude Include="..\src\collision_process.hpp" />
     <ClInclude Include="..\src\color.hpp" />
     <ClInclude Include="..\src\component.hpp" />
-    <ClInclude Include="..\src\controller_process.hpp" />
     <ClInclude Include="..\src\datetime.hpp" />
     <ClInclude Include="..\src\dir_monitor.hpp" />
     <ClInclude Include="..\src\engine.hpp" />
@@ -58,17 +60,20 @@
     <ClInclude Include="..\src\map.hpp" />
     <ClInclude Include="..\src\node.hpp" />
     <ClInclude Include="..\src\node_utils.hpp" />
+    <ClInclude Include="..\src\noiseutils.h" />
     <ClInclude Include="..\src\profile_timer.hpp" />
     <ClInclude Include="..\src\quadtree.hpp" />
     <ClInclude Include="..\src\ref_counted_ptr.hpp" />
     <ClInclude Include="..\src\render_process.hpp" />
     <ClInclude Include="..\src\sdl_wrapper.hpp" />
     <ClInclude Include="..\src\process.hpp" />
+    <ClInclude Include="..\src\terrain_generator.hpp" />
     <ClInclude Include="..\src\unit_test.hpp" />
     <ClInclude Include="..\src\wm.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\assimp-3.1.1\lib32\assimp.lib" />
+    <Library Include="..\..\noise\win32\Release\libnoise.lib" />
     <Library Include="..\..\SDL\VisualC\SDLmain\Win32\Release\SDL2main.lib" />
     <Library Include="..\..\SDL\VisualC\SDL\Win32\Release\SDL2.lib" />
     <Library Include="..\..\SDL_image\VisualC\Win32\Release\SDL2_image.lib" />

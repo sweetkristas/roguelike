@@ -60,10 +60,10 @@ namespace component
 
 	struct position : public component
 	{
-		explicit position(int xx, int yy) : component(Component::POSITION), p(xx, yy), last_p() {}
-		explicit position(const point& pp) : component(Component::POSITION), p(pp), last_p() {}
-		point p;
-		point last_p;
+		position() : component(Component::POSITION) {}
+		position(const point& p) : component(Component::POSITION), pos(p) {}
+		point pos;
+		point mov;
 	};
 
 	struct sprite : public component
@@ -93,12 +93,11 @@ namespace component
 		input() : component(Component::INPUT) {}
 		enum class Action {
 			none,
-			up,
-			down,
-			left,
-			right,
+			moved,
 			use,
 			attack,
+			spell,
+			pass,
 		} action;
 	};
 

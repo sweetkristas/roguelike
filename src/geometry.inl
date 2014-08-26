@@ -97,6 +97,12 @@ namespace geometry
 	}
 
 	template<typename T> inline
+	Point<T> operator+(const Point<T>& lhs, const Point<T>& rhs)
+	{
+		return Point<T>(lhs.x+rhs.x,lhs.y+rhs.y);
+	}
+
+	template<typename T> inline
 	Rect<T> Rect<T>::FromCoordinates(T x1, T y1, T x2, T y2)
 	{
 		if(x1 > x2+1) {

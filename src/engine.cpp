@@ -47,7 +47,7 @@ void engine::remove_process(process::process_ptr s)
 const point& engine::get_camera() 
 { 
 	ASSERT_LOG(camera_ != nullptr, "Dereference null camera.");
-	return camera_->p; 
+	return camera_->pos; 
 }
 
 void engine::process_events()
@@ -102,7 +102,7 @@ void engine::populate_quadtree()
 
 	for(auto& e : entity_list_) {
 		if((e->get()->mask & collision_map_mask) == collision_mask) {
-			auto& pos = e->get()->pos->p;
+			auto& pos = e->get()->pos->pos;
 			auto& spr = e->get()->spr;
 			entity_quads_.insert(e, rect(pos.x, pos.y, spr->width, spr->height));
 		}

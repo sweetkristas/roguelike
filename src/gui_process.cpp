@@ -43,8 +43,8 @@ namespace process
 				auto surf = font::render_shaded(ss.str(), fnt, graphics::color(255,255,255), graphics::color(0,0,0));
 				// surface gets free'd by update_texture, so we need to get height (and width if needed) before we call it.
 				// gui tagged entities get absolute pixel positioning for *free*.
-				pos->p.x = 0;
-				pos->p.y = eng.get_window().height() - surf->h;
+				pos->pos.x = 0;
+				pos->pos.y = eng.get_window().height() - surf->h;
 				spr->update_texture(eng.get_renderer(), surf);
 			}
 		}
