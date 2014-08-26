@@ -1,48 +1,49 @@
 #pragma once
 
-#include "ref_counted_ptr.hpp"
+#include "geometry.hpp"
 #include "surface.hpp"
 
 namespace graphics
 {
-	class texture;
-	typedef boost::intrusive_ptr<texture> texture_ptr;
-	typedef boost::intrusive_ptr<const texture> const_texture_ptr;
+	enum class TextureFlags
+	{
+		NO_CACHE	= 1,
+	};
+	
+	inline TextureFlags operator|(TextureFlags lhs, TextureFlags rhs)
+	{
+		return static_cast<TextureFlags>(static_cast<int>(lhs) | static_cast<int>(rhs));
+	}
 
-	class texture : public reference_counted_ptr
+	inline TextureFlags operator&(TextureFlags lhs, TextureFlags rhs)
+	{
+		return static_cast<TextureFlags>(static_cast<int>(lhs)& static_cast<int>(rhs));
+	}
+
+	class texture
 	{
 	public:
-		enum
-		{
-			SCALE_IMAGE_TO_TEXTURE = 1,
-			GENERATE_MIPMAP = 2,
-			NO_CACHE = 4,
-		};
-		GLuint id() const { return tex_id_; }
+		explicit texture(SDL_Renderer* r);
+		explicit texture(SDL_Renderer* r, const std::string& fname, TextureFlags flags, const rect& area=rect());
+		explicit texture(SDL_Renderer* r, const surface& surf, TextureFlags flags, const rect& area=rect());
 
-		GLfloat tc_x(GLfloat x) const;
-		GLfloat tc_y(GLfloat y) const;
+		const rect& get_area() const { return area_; }
+		void set_area(const rect& area);
 
-		GLfloat width() const { return width_; }
-		GLfloat height() const { return height_; }
+		void update(const std::string& fname, const rect& area = rect());
+		void update(const surface& surf, const rect& area = rect());
 
-		static const_texture_ptr get(const std::string& fname, unsigned tf = SCALE_IMAGE_TO_TEXTURE | GENERATE_MIPMAP);
-		static const_texture_ptr get(surface_ptr, unsigned tf = SCALE_IMAGE_TO_TEXTURE);
+		void blit(const rect& dst);
+		//void blit_ex(SDL_Renderer* renderer, const rect& dst, double angle, const point& center, FlipFlags flip);
 		static void rebuild_cache();
 	protected:
-		texture();
-		explicit texture(const std::string& fname, unsigned tf);
-		explicit texture(surface_ptr, unsigned tf);
 	private:
+		texture();
 		static void texture_from_surface(SDL_Surface* source, texture* tex);
 		static void load_file_into_texture(const std::string& fname, texture* tex);
-
-		std::string name_;
-		GLuint tex_id_;
-		GLfloat ratio_w_;
-		GLfloat ratio_h_;
-		unsigned flags_;
-		GLfloat width_;
-		GLfloat height_;
+		SDL_Renderer* renderer_;
+		rect area_;
+		TextureFlags flags_;
+		std::shared_ptr<SDL_Texture> tex_;
 	};
 }

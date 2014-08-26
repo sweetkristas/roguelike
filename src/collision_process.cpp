@@ -73,22 +73,22 @@ namespace process
 						continue;
 					}
 					if((e2->get()->mask & (collision_mask | (1 << component::Component::MAP))) == collision_mask) {
-						auto& e2pos = e2->get()->pos;
+						//auto& e2pos = e2->get()->pos;
 						// entity - map collision
-						if(!is_passable(e1map->map[e2pos->p.y][e2pos->p.x])) {
-							e2pos->p = e2pos->last_p;
-						}
-						for(auto& exitp : e1map->exits) {
-							if(e2pos->p == exitp) {
-								if(e2->get()->is_player()) {
-									// XXX do some exit logic, quitting the game for now
-									eng.set_state(EngineState::QUIT);
-								} else {
-									// don't let the non-player controlled entities leave via exit
-									e2pos->p = e2pos->last_p;
-								}
-							}
-						}
+						//if(!is_passable(e1map->map[e2pos->p.y][e2pos->p.x])) {
+						//	e2pos->p = e2pos->last_p;
+						//}
+						//for(auto& exitp : e1map->exits) {
+						//	if(e2pos->p == exitp) {
+						//		if(e2->get()->is_player()) {
+						//			// XXX do some exit logic, quitting the game for now
+						//			eng.set_state(EngineState::QUIT);
+						//		} else {
+						//			// don't let the non-player controlled entities leave via exit
+						//			e2pos->p = e2pos->last_p;
+						//		}
+						//	}
+						//}
 					} 
 				}
 			}

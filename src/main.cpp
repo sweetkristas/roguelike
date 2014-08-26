@@ -114,6 +114,54 @@ SDL_Surface* make_surface_from_strings(const std::vector<std::string>& strs)
 	return dst;
 }
 
+SDL_Surface* make_surface_from_strings2(const std::vector<std::vector<std::string>>& strs)
+{
+	std::vector<SDL_Surface*> surfaces;
+	surfaces.reserve(strs.size());
+	graphics::color white(255, 255, 255);
+	int max_height = 0;
+	int max_width = -1;
+	font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
+	for(auto& row : strs) {
+		int h = -1;
+		int w = 0;
+		for(auto& s : row) {
+			auto surf = font::render(s, fnt, white);
+			if(surf->h > h) {
+				h = surf->h;
+			}
+			w += surf->w;
+			surfaces.emplace_back(surf);
+		}
+		if(w > max_width) {
+			max_width = w;
+		}
+		max_height += h;
+	}
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	Uint32 rmask = 0xff000000;
+	Uint32 gmask = 0x00ff0000;
+	Uint32 bmask = 0x0000ff00;
+	Uint32 amask = 0x000000ff;
+#else
+	Uint32 rmask = 0x000000ff;
+	Uint32 gmask = 0x0000ff00;
+	Uint32 bmask = 0x00ff0000;
+	Uint32 amask = 0xff000000;
+#endif	
+	auto dst = SDL_CreateRGBSurface(0, max_width, max_height, 32, rmask, gmask, bmask, amask);
+	SDL_SetSurfaceBlendMode(dst, SDL_BLENDMODE_NONE);
+	ASSERT_LOG(dst != NULL, "Error creating destination surface: " << SDL_GetError());
+	int height = 0;
+	for(auto& surf : surfaces) {
+		SDL_Rect dr = {0, height, surf->w, surf->h};
+		SDL_BlitSurface(surf, NULL, dst, &dr);
+		height += surf->h;
+		SDL_FreeSurface(surf);
+	}
+	return dst;
+}
+
 std::vector<std::string> convert_map_to_strings(const map_type& m)
 {
 	std::vector<std::string> res;
@@ -131,6 +179,50 @@ std::vector<std::string> convert_map_to_strings(const map_type& m)
 SDL_Surface* make_surface_from_map(const map_type& m)
 {
 	return make_surface_from_strings(convert_map_to_strings(m));
+}
+
+SDL_Surface* make_surface_from_terrain(const node& terrain_symbols, const std::vector<terrain::chunk_ptr>& chunks)
+{
+	std::vector<std::vector<std::string>> res;
+	// scan through to calculate max sizes we'll need
+	int x1 = std::numeric_limits<int>::max();
+	int x2 = std::numeric_limits<int>::min();
+	int y1 = std::numeric_limits<int>::max();
+	int y2 = std::numeric_limits<int>::min();
+	for(auto& chk : chunks) {
+		if(x1 > chk->position().x - chk->width() / 2) { x1 = chk->position().x - chk->width() / 2; }
+		if(x2 < chk->position().x + chk->width() / 2) { x2 = chk->position().x + chk->width() / 2; }
+		if(y1 > chk->position().y - chk->height() / 2) { y1 = chk->position().y - chk->height() / 2; }
+		if(y2 < chk->position().y + chk->height() / 2) { y2 = chk->position().y + chk->height() / 2; }
+	}
+	res.resize(y2 - y1);
+	for(auto& row : res) {
+		row.resize(x2 - x1);
+	}
+	for(auto& chk : chunks) {
+		for(int y = 0; y != chk->height(); ++y) {
+			for(int x = 0; x != chk->width(); ++x) {
+				auto tt = chk->get_at(x, y);
+				std::string sym;
+				switch(tt) {
+					case terrain::TerrainType::VOID: sym = terrain_symbols["void"].as_string(); break;
+					case terrain::TerrainType::DIRT: sym = terrain_symbols["dirt"].as_string(); break;
+					case terrain::TerrainType::GRASS: sym = terrain_symbols["grass"].as_string(); break;
+					case terrain::TerrainType::SHALLOW_WATER: sym = terrain_symbols["shallow_water"].as_string(); break;
+					case terrain::TerrainType::DEEP_WATER: sym = terrain_symbols["deep_water"].as_string(); break;
+					case terrain::TerrainType::SHORE: sym = terrain_symbols["shore"].as_string(); break;
+					case terrain::TerrainType::SAND: sym = terrain_symbols["sand"].as_string(); break;
+					case terrain::TerrainType::HILL: sym = terrain_symbols["hill"].as_string(); break;
+					case terrain::TerrainType::MOUNTAIN: sym = terrain_symbols["mountain"].as_string(); break;
+					default:
+						ASSERT_LOG(false, "Unknown terrain type: " << static_cast<int>(tt));
+						break;
+				}
+				res[y + chk->position().y - y1 - chk->height() / 2][x + chk->position().x - x1 - chk->width() / 2] = sym;
+			}
+		}
+	}
+	return make_surface_from_strings2(res);
 }
 
 void create_player(engine& e, const point& start)
@@ -164,7 +256,7 @@ void create_player(engine& e, const point& start)
 	e.add_entity(gui);
 }
 
-entity_ptr create_cave(engine& e)
+/*entity_ptr create_cave(engine& e)
 {
 	entity_ptr cave = std::make_shared<entity>();
 	cave->get()->mask |= 1 << component::Component::SPRITE;
@@ -175,6 +267,22 @@ entity_ptr create_cave(engine& e)
 	cave->get()->pos = std::make_shared<component::position>(0,0);
 	e.add_entity(cave);
 	return cave;
+}*/
+
+entity_ptr create_world(engine& e, const node& terrain_symbols)
+{
+	entity_ptr world = std::make_shared<entity>();
+	world->get()->mask |= 1 << component::Component::SPRITE;
+	world->get()->mask |= 1 << component::Component::MAP;
+	world->get()->mask |= 1 << component::Component::COLLISION;
+	world->get()->map = std::make_shared<component::mapgrid>();
+	int screen_width_in_tiles  = (e.get_window().width() + e.get_tile_size().x - 1) / e.get_tile_size().x;
+	int screen_height_in_tiles = (e.get_window().height() + e.get_tile_size().y - 1) / e.get_tile_size().y;
+	rect area = rect::from_coordinates(-screen_width_in_tiles / 2, -screen_height_in_tiles / 2, screen_width_in_tiles / 2, screen_height_in_tiles / 2);
+	auto chunks = world->get()->map->t.get_chunks_in_area(area);
+	world->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), make_surface_from_terrain(terrain_symbols, chunks));
+	e.add_entity(world);
+	return world;
 }
 
 void create_goblin(engine& e)
@@ -194,6 +302,11 @@ void create_goblin(engine& e)
 	auto surf = font::render_shaded("g", fnt, graphics::color(0,96,16), graphics::color(0,0,0));
 	mob->get()->spr = std::make_shared<component::sprite>(e.get_renderer(), surf);
 	e.add_entity(mob);
+}
+
+node load_terrain_map(const std::string& filename)
+{
+	return json::parse_from_file(filename);
 }
 
 int main(int argc, char* argv[])
@@ -251,11 +364,17 @@ int main(int argc, char* argv[])
 		font::get_text_size(fnt, "X", &cw, &ch);
 		LOG_INFO("Tile Size: (" << cw << "," << ch << ")");
 
+		node terrain_symbols = load_terrain_map("data/terrain.cfg")["terrain_symbols"];
+
 		// XX engine should take the renderer as a parameter, expose it as a get function, then pass itself
 		// to the update function.
 		engine e(wm);
-		auto cave = create_cave(e);
-		create_player(e, cave->get()->map->start);
+		e.set_tile_size(point(cw, ch));
+		//auto cave = create_cave(e);
+		//create_player(e, cave->get()->map->start);
+	
+		create_world(e, terrain_symbols);
+		create_player(e, point(0, 0));
 		create_goblin(e);
 		e.add_process(std::make_shared<process::movement>());
 		e.add_process(std::make_shared<process::input>());
@@ -265,7 +384,6 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::ai>());
 		e.add_process(std::make_shared<process::em_collision>());
 		e.add_process(std::make_shared<process::ee_collision>());
-		e.set_tile_size(point(cw, ch));
 
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();

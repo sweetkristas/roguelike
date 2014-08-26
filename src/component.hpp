@@ -11,6 +11,7 @@
 #include "geometry.hpp"
 #include "map.hpp"
 #include "node.hpp"
+#include "terrain_generator.hpp"
 
 
 typedef std::bitset<64> component_id;
@@ -123,11 +124,13 @@ namespace component
 
 	struct mapgrid : public component
 	{
-		mapgrid(const node& n);
-		point start;
-		// XXX need to know where exists are linked to.
-		std::vector<point> exits;
-		map_type map;
+		//mapgrid(const node& n);
+		mapgrid();
+		terrain::terrain t;
+		//point start;
+		// XXX need to know where exits are linked to.
+		//std::vector<point> exits;
+		//map_type map;
 	};
 
 	struct component_set

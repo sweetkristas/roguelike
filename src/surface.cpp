@@ -7,19 +7,22 @@ namespace graphics
 {
 	surface::surface(const std::string& fname)
 	{
-		surf_ = IMG_Load(fname.c_str());
+		auto surf = IMG_Load(fname.c_str());
 		ASSERT_LOG(surf_ != NULL, "Failed to load image: " << fname << " : " << IMG_GetError());
+		surf_.reset(surf, [](SDL_Surface* surf){
+			SDL_FreeSurface(surf);
+		});
 	}
 
 	surface::surface(SDL_Surface* surf)
-		: surf_(surf)
 	{
+		ASSERT_LOG(surf != NULL, "Surface passed in was null.");
+		surf_.reset(surf, [](SDL_Surface* surf) {
+			SDL_FreeSurface(surf);
+		});
 	}
 
 	surface::~surface()
 	{
-		ASSERT_LOG(surf_ != NULL, "Error destructing surface. Is NULL");
-		SDL_FreeSurface(surf_);
-		surf_ = NULL;
 	}
 }

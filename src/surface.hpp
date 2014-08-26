@@ -1,7 +1,7 @@
 #pragma once
 
+#include <memory>
 #include "SDL.h"
-#include "ref_counted_ptr.hpp"
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 #	define SURFACE_MASK 0xFF,0xFF00,0xFF0000,0xFF000000
@@ -21,21 +21,20 @@
 
 namespace graphics
 {
-	class surface : public reference_counted_ptr
+	class surface
 	{
 	public:
 		explicit surface(const std::string& fname);
 		explicit surface(SDL_Surface* surf);
-		virtual ~surface();
+		~surface();
 
-		SDL_Surface* get() { return surf_; }
+		SDL_Surface* get() { return surf_.get(); }
+		const SDL_Surface* get() const { return surf_.get(); }
 
 		int width() const { return surf_->w; }
 		int height() const { return surf_->h; }
 	private:
 		surface();
-		SDL_Surface* surf_;
+		std::shared_ptr<SDL_Surface> surf_;
 	};
-
-	typedef boost::intrusive_ptr<surface> surface_ptr;
 }

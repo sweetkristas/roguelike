@@ -50,7 +50,12 @@ namespace component
 		}
 	}
 
-	mapgrid::mapgrid(const node& n)
+	mapgrid::mapgrid()
+		: component(Component::MAP)
+	{
+	}
+
+	/*mapgrid::mapgrid(const node& n)
 		: component(Component::MAP)
 	{
 		auto mp = n["map"].as_list_strings();
@@ -75,5 +80,5 @@ namespace component
 			map.emplace_back(new_row);
 			++y;
 		}
-	}
+	}*/
 }
