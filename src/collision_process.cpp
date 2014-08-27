@@ -76,7 +76,7 @@ namespace process
 		// XXX Please make quad-tree or kd-tree for O(nlogn)
 		for(auto& e1 : elist) {
 			if((e1->get()->mask & map_mask) == map_mask) {
-				auto& e1map = e1->get()->map;
+				//auto& e1map = e1->get()->map;
 				for(auto& e2 : elist) {
 					if(e1 == e2) {
 						continue;

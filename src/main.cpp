@@ -10,7 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "action_proces.hpp"
+#include "action_process.hpp"
 #include "ai_process.hpp"
 #include "asserts.hpp"
 #include "collision_process.hpp"

@@ -50,8 +50,9 @@ endif
 USE_LUA?=$(shell pkg-config --exists lua5.2 && echo yes)
 
 # Initial compiler options, used before CXXFLAGS and CPPFLAGS.
+# -Wno-reorder -Wno-unused-variable added to make noiseutils.cpp build
 BASE_CXXFLAGS += -std=c++11 -g -rdynamic -fno-inline-functions \
-	-fthreadsafe-statics -Werror -Wall
+	-fthreadsafe-statics -Werror -Wall -Wno-reorder -Wno-unused-variable
 
 # Compiler include options, used after CXXFLAGS and CPPFLAGS.
 INC := -Isrc -Iinclude $(shell pkg-config --cflags x11 sdl2 glew SDL2_image SDL2_ttf libpng zlib)
@@ -81,7 +82,7 @@ roguelike: $(objects) $(ogl_objects) $(sdl_objects) $(ogl_fixed_objects)
 	@$(CCACHE) $(CXX) \
 		$(BASE_CXXFLAGS) $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INC) \
 		$(objects) $(ogl_objects) $(sdl_objects) $(ogl_fixed_objects) -o roguelike \
-		$(LIBS) -lboost_regex -lboost_system -lboost_filesystem -lboost_thread -fthreadsafe-statics
+		$(LIBS) -lboost_regex -lboost_system -lboost_filesystem -lboost_thread -lnoise -fthreadsafe-statics
 
 # pull in dependency info for *existing* .o files
 -include $(objects:.o=.d)
