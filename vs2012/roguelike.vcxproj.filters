@@ -90,6 +90,12 @@
     <ClCompile Include="..\src\action_proces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\particles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\parameters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\filesystem.hpp">
@@ -186,6 +192,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\action_proces.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\particles.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\particles_fwd.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\parameters.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

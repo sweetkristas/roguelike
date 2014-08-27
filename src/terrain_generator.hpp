@@ -39,7 +39,7 @@ namespace terrain
 
 	struct point_hash
 	{
-		std::size_t operator()(const point & p);
+		std::size_t operator()(const point& p) const;
 	};
 
 	class gradient_point

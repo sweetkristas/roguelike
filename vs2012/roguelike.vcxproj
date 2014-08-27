@@ -31,6 +31,8 @@
     <ClCompile Include="..\src\node_utils.cpp" />
     <ClCompile Include="..\src\noiseutils.cpp" />
     <ClCompile Include="..\src\notify.cpp" />
+    <ClCompile Include="..\src\parameters.cpp" />
+    <ClCompile Include="..\src\particles.cpp" />
     <ClCompile Include="..\src\render_process.cpp" />
     <ClCompile Include="..\src\process.cpp" />
     <ClCompile Include="..\src\terrain_generator.cpp" />
@@ -61,6 +63,9 @@
     <ClInclude Include="..\src\node.hpp" />
     <ClInclude Include="..\src\node_utils.hpp" />
     <ClInclude Include="..\src\noiseutils.h" />
+    <ClInclude Include="..\src\parameters.hpp" />
+    <ClInclude Include="..\src\particles.hpp" />
+    <ClInclude Include="..\src\particles_fwd.hpp" />
     <ClInclude Include="..\src\profile_timer.hpp" />
     <ClInclude Include="..\src\quadtree.hpp" />
     <ClInclude Include="..\src\ref_counted_ptr.hpp" />

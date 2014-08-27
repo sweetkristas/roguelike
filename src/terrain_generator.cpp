@@ -35,11 +35,11 @@ namespace terrain
 		terrain_[y][x] = tt;
 	}
 
-	std::size_t point_hash::operator()(const point & p)
+	std::size_t point_hash::operator()(const point& p) const
 	{
 		std::size_t seed = 0;
-		boost::hash_combine(seed, p.x);
-		boost::hash_combine(seed, p.y);
+		boost::hash_combine(seed, boost::hash_value(p.x));
+		boost::hash_combine(seed, boost::hash_value(p.y));
 		return seed;
 	}
 

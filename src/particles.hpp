@@ -3,6 +3,7 @@
 #include <tuple>
 
 #include "SDL.h"
+#define GLM_FORCE_RADIANS
 #include <glm/gtx/quaternion.hpp>
 
 #include "color.hpp"
