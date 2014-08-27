@@ -3,6 +3,8 @@
 #include <memory>
 #include "SDL.h"
 
+#include "geometry.hpp"
+
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 #	define SURFACE_MASK 0xFF,0xFF00,0xFF0000,0xFF000000
 #	define SURFACE_MASK_RGB 0xFF,0xFF00,0xFF0000,0x0
@@ -24,6 +26,7 @@ namespace graphics
 	class surface
 	{
 	public:
+		explicit surface(int width, int height);
 		explicit surface(const std::string& fname);
 		explicit surface(SDL_Surface* surf);
 		~surface();
@@ -33,8 +36,15 @@ namespace graphics
 
 		int width() const { return surf_->w; }
 		int height() const { return surf_->h; }
+
+		// clipped blit
+		void blit_clipped(const surface& src, const rect& dst_rect);
+		// scaled blit
+		void blit_scaled(const surface& src, const rect& dst_rect);
 	private:
 		surface();
 		std::shared_ptr<SDL_Surface> surf_;
 	};
 }
+
+typedef std::shared_ptr<graphics::surface> surface_ptr;

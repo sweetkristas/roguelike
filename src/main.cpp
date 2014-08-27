@@ -1,5 +1,6 @@
 			//auto tex = graphics::texture::get("images/noise1.png");
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,7 @@
 #include "node_utils.hpp"
 #include "profile_timer.hpp"
 #include "render_process.hpp"
+#include "surface.hpp"
 #include "sdl_wrapper.hpp"
 #include "unit_test.hpp"
 #include "wm.hpp"
@@ -181,6 +183,69 @@ SDL_Surface* make_surface_from_map(const map_type& m)
 	return make_surface_from_strings(convert_map_to_strings(m));
 }
 
+namespace {
+	typedef std::map<terrain::TerrainType, surface_ptr> tile_cache;
+	tile_cache& get_tile_surface_cache() 
+	{
+		static tile_cache res;
+		return res;
+	}
+
+	int tile_width = 32;
+	int tile_height = 32;
+
+	void make_tile_cache(const node& tiles)
+	{
+		auto& cache = get_tile_surface_cache();
+		for(auto& t : tiles.as_map()) {
+			const auto& index_str = t.first.as_string();
+			const auto& filename = t.second.as_string();
+			terrain::TerrainType index;
+			if(index_str == "void") {
+				index = terrain::TerrainType::VOID;
+			} else if(index_str == "grass") {
+				index = terrain::TerrainType::GRASS;
+			} else if(index_str == "dirt") {
+				index = terrain::TerrainType::DIRT;
+			} else if(index_str == "shore") {
+				index = terrain::TerrainType::SHORE;
+			} else if(index_str == "sand") {
+				index = terrain::TerrainType::SAND;
+			} else if(index_str == "shallow_water") {
+				index = terrain::TerrainType::SHALLOW_WATER;
+			} else if(index_str == "deep_water") {
+				index = terrain::TerrainType::DEEP_WATER;
+			} else if(index_str == "hill") {
+				index = terrain::TerrainType::HILL;
+			} else if(index_str == "mountain") {
+				index = terrain::TerrainType::MOUNTAIN;
+			}
+			cache[index] = std::make_shared<graphics::surface>(filename);
+			// XX we should auto calculate tile width and height
+			// and assert if we load a tile of incorrect size.
+			// else we should do a scaled blit to the requested size.
+		}
+	}
+}
+
+graphics::surface make_surface_from_chunk(terrain::chunk_ptr chk)
+{
+	const auto& cache = get_tile_surface_cache();
+	int w = tile_width * chk->width();
+	int h = tile_height * chk->height();
+	
+	graphics::surface dst(w, h);
+	for(int y = 0; y != chk->height(); ++y) {
+		for(int x = 0; x != chk->width(); ++x) {
+			auto tt = chk->get_at(x, y);
+			auto it = cache.find(tt);
+			ASSERT_LOG(it != cache.end(), "Unable to find terrain type: " << static_cast<int>(tt));
+			dst.blit_scaled(*it->second, rect(x*tile_width, y*tile_height, tile_width, tile_height));
+		}
+	}
+	return dst;
+}
+
 SDL_Surface* make_surface_from_terrain(const node& terrain_symbols, const std::vector<terrain::chunk_ptr>& chunks)
 {
 	std::vector<std::vector<std::string>> res;
@@ -309,6 +374,18 @@ node load_terrain_map(const std::string& filename)
 	return json::parse_from_file(filename);
 }
 
+// XXX Seriously make one module which exports creating random real/int values that everyone can use!!!!
+namespace
+{
+	auto const seed = std::default_random_engine()();
+	int get_random_int(int mn = std::numeric_limits<int>::min(), int mx = std::numeric_limits<int>::max())
+	{
+		static std::mt19937 random_engine(seed);
+		std::uniform_int_distribution<int> uniform_dist(mn, mx);
+		return uniform_dist(random_engine);
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	std::vector<std::string> args;
@@ -372,8 +449,18 @@ int main(int argc, char* argv[])
 		e.set_tile_size(point(cw, ch));
 		//auto cave = create_cave(e);
 		//create_player(e, cave->get()->map->start);
+
+		terrain::chunk_ptr test = std::make_shared<terrain::chunk>(point(0,0), 16, 16);
+		for(int y = 0; y < 16; ++y) {
+			for(int x = 0; x < 16; ++x) {
+				test->set_at(x, y, static_cast<terrain::TerrainType>(get_random_int(0,8)));
+			}
+		}
+		make_tile_cache(load_terrain_map("data/terrain.cfg")["tiles"]);
+		auto chk_surf = make_surface_from_chunk(test);
+		auto chk_tex = SDL_CreateTextureFromSurface(wm.get_renderer(), chk_surf.get());
 	
-		create_world(e, terrain_symbols);
+		//create_world(e, terrain_symbols);
 		create_player(e, point(0, 0));
 		create_goblin(e);
 		e.add_process(std::make_shared<process::input>());
@@ -390,6 +477,11 @@ int main(int argc, char* argv[])
 			profile::timer tm;
 
 			SDL_RenderClear(wm.get_renderer());
+
+			// XXX
+			SDL_Rect dr = {(wm.width() - chk_surf.width())/2, (wm.height() - chk_surf.height())/2, chk_surf.width(), chk_surf.height()};
+			SDL_RenderCopy(wm.get_renderer(), chk_tex, NULL, &dr);
+
 			running = e.update(60.0/1000.0);
 			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
@@ -402,6 +494,8 @@ int main(int argc, char* argv[])
 				SDL_Delay(FRAME_RATE - delay);
 			}
 		}
+
+		SDL_DestroyTexture(chk_tex);
 
 	} catch(std::exception& e) {
 		std::cerr << e.what();

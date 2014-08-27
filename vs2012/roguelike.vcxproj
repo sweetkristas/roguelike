@@ -35,6 +35,7 @@
     <ClCompile Include="..\src\particles.cpp" />
     <ClCompile Include="..\src\render_process.cpp" />
     <ClCompile Include="..\src\process.cpp" />
+    <ClCompile Include="..\src\surface.cpp" />
     <ClCompile Include="..\src\terrain_generator.cpp" />
     <ClCompile Include="..\src\unit_test.cpp" />
     <ClCompile Include="..\src\wm.cpp" />
@@ -72,6 +73,7 @@
     <ClInclude Include="..\src\render_process.hpp" />
     <ClInclude Include="..\src\sdl_wrapper.hpp" />
     <ClInclude Include="..\src\process.hpp" />
+    <ClInclude Include="..\src\surface.hpp" />
     <ClInclude Include="..\src\terrain_generator.hpp" />
     <ClInclude Include="..\src\unit_test.hpp" />
     <ClInclude Include="..\src\wm.hpp" />
