@@ -5,7 +5,7 @@
 
 # Game engine
 objects = \
-	src/action_proces.o \
+	src/action_process.o \
 	src/ai_process.o \
 	src/collision_process.o \
 	src/color.o \
