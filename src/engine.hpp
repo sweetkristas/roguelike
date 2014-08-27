@@ -6,6 +6,7 @@
 #include "component.hpp"
 #include "entity.hpp"
 #include "geometry.hpp"
+#include "particles.hpp"
 #include "process.hpp"
 #include "quadtree.hpp"
 #include "wm.hpp"
@@ -47,6 +48,8 @@ public:
 	void set_camera(const std::shared_ptr<component::position>& cam) { camera_ = cam; }
 	const point& get_camera();
 
+	particle::particle_system_manager& get_particles() { return particles_; }
+
 	std::vector<entity_ptr> entities_in_area(const rect& r);
 
 	const point& get_tile_size() const { return tile_size_; }
@@ -63,4 +66,5 @@ private:
 	quadtree<entity_ptr> entity_quads_;
 	std::vector<process::process_ptr> process_list_;
 	point tile_size_;
+	particle::particle_system_manager particles_;
 };

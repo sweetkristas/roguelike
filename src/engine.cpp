@@ -3,13 +3,15 @@
 #include "asserts.hpp"
 #include "component.hpp"
 #include "engine.hpp"
+#include "node_utils.hpp"
 #include "profile_timer.hpp"
 
 engine::engine(graphics::window_manager& wm)
 	: state_(EngineState::PLAY),
 	  turns_(1),
 	  wm_(wm),
-	  entity_quads_(0, rect(0,0,100,100))
+	  entity_quads_(0, rect(0,0,100,100)),
+	  particles_(wm.get_renderer())
 {
 }
 
@@ -76,6 +78,22 @@ void engine::process_events()
 						}
 						claimed = true;
 					}
+				} else if(evt.key.keysym.scancode == SDL_SCANCODE_T) {
+					// test code
+					point pos(wm_.width() / 2, wm_.height() / 2);
+					node_builder nb;
+					nb.add("lifetime", 5.0);
+					node_builder em;
+					em.add("type", "square");
+					///em.add("max_particles", 2000);
+					//em.add("circle_radius", 20.0);
+					//em.add("emit_random", true);
+					em.add("dimensions", 20.0);
+					em.add("dimensions", 10.0);
+					em.add("particle_lifetime", 2.0);
+					em.add("rate", 500.0);
+					nb.add("emitter", em.build());
+					particles_.add_system(particle::particle_system::create(pos, nb.build()));
 				}
 				break;
 		}
@@ -128,6 +146,8 @@ bool engine::update(double time)
 		p->update(*this, time, entity_list_);
 	}
 
+	particles_.update(static_cast<float>(time));
+	particles_.draw();
 	return true;
 }
 

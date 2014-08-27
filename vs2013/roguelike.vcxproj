@@ -11,11 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\action_proces.cpp" />
     <ClCompile Include="..\src\ai_process.cpp" />
     <ClCompile Include="..\src\collision_process.cpp" />
     <ClCompile Include="..\src\color.cpp" />
     <ClCompile Include="..\src\component.cpp" />
-    <ClCompile Include="..\src\controller_process.cpp" />
     <ClCompile Include="..\src\datetime.cpp" />
     <ClCompile Include="..\src\engine.cpp" />
     <ClCompile Include="..\src\entity.cpp" />
@@ -31,6 +31,8 @@
     <ClCompile Include="..\src\node_utils.cpp" />
     <ClCompile Include="..\src\noiseutils.cpp" />
     <ClCompile Include="..\src\notify.cpp" />
+    <ClCompile Include="..\src\parameters.cpp" />
+    <ClCompile Include="..\src\particles.cpp" />
     <ClCompile Include="..\src\process.cpp" />
     <ClCompile Include="..\src\render_process.cpp" />
     <ClCompile Include="..\src\surface.cpp" />
@@ -40,12 +42,12 @@
     <ClCompile Include="..\src\wm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\action_proces.hpp" />
     <ClInclude Include="..\src\ai_process.hpp" />
     <ClInclude Include="..\src\basic_dir_monitor.hpp" />
     <ClInclude Include="..\src\collision_process.hpp" />
     <ClInclude Include="..\src\color.hpp" />
     <ClInclude Include="..\src\component.hpp" />
-    <ClInclude Include="..\src\controller_process.hpp" />
     <ClInclude Include="..\src\datetime.hpp" />
     <ClInclude Include="..\src\dir_monitor.hpp" />
     <ClInclude Include="..\src\engine.hpp" />
@@ -64,6 +66,9 @@
     <ClInclude Include="..\src\node.hpp" />
     <ClInclude Include="..\src\node_utils.hpp" />
     <ClInclude Include="..\src\noiseutils.h" />
+    <ClInclude Include="..\src\parameters.hpp" />
+    <ClInclude Include="..\src\particles.hpp" />
+    <ClInclude Include="..\src\particles_fwd.hpp" />
     <ClInclude Include="..\src\process.hpp" />
     <ClInclude Include="..\src\profile_timer.hpp" />
     <ClInclude Include="..\src\quadtree.hpp" />
