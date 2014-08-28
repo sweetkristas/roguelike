@@ -10,9 +10,9 @@ objects = \
 	src/collision_process.o \
 	src/color.o \
 	src/component.o \
+	src/creature.o \
 	src/datetime.o \
 	src/engine.o \
-	src/entity.o \
 	src/filesystem.o \
 	src/font.o \
 	src/generate_cave.o \
@@ -28,6 +28,7 @@ objects = \
 	src/parameters.o \
 	src/particles.o \
 	src/process.o \
+	src/random.o \
 	src/render_process.o \
 	src/surface.o \
 	src/terrain_generator.o \

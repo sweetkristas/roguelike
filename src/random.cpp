@@ -1,7 +1,7 @@
 #include "asserts.hpp"
 #include "random.hpp"
 
-namespace random
+namespace generator
 {
 	namespace
 	{

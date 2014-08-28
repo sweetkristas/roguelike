@@ -2,7 +2,7 @@
 
 #include <random>
 
-namespace random
+namespace generator
 {
 	std::size_t get_seed();
 	void set_seed(std::size_t seed);

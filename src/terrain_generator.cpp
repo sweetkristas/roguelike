@@ -122,7 +122,7 @@ namespace terrain
 		for(int y = 0; y != chk->height(); ++y) {
 			for(int x = 0; x != chk->width(); ++x) {
 				auto height_value = chk->get_at(x, y);
-				auto& surf = cache.get_surface_at_height(height_value);
+				auto surf = cache.get_surface_at_height(height_value);
 				dst->blit_scaled(surf, rect(x * tile_size.x, y * tile_size.y, tile_size.x, tile_size.y));
 			}
 		}
@@ -219,7 +219,7 @@ namespace terrain
 		using namespace noise;
 		module::Perlin pnoise;
 		const double scale = 4.0;
-		pnoise.SetSeed(static_cast<int>(random::get_seed()));
+		pnoise.SetSeed(static_cast<int>(generator::get_seed()));
 		chunk_ptr nchunk = std::make_shared<chunk>(pos, chunk_size_w_, chunk_size_h_);
 		for(int y = 0; y < chunk_size_h_; ++y) {
 			for(int x = 0; x < chunk_size_w_; ++x) {

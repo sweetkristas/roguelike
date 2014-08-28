@@ -16,7 +16,7 @@ namespace
 			}
 		}
 		float get_value(float t) {
-			return random::get_uniform_real<float>(min_, max_);
+			return generator::get_uniform_real<float>(min_, max_);
 		}
 	private:
 		float min_;

@@ -81,8 +81,8 @@ namespace creature
 				// XXX fix zorder here.
 				if((component_mask_ & genmask(Component::STATS)) == genmask(Component::STATS)) {
 					res->stat = std::make_shared<stats>();
-					res->stat->health = random::get_uniform_int(health_min_, health_max_);
-					res->stat->attack = random::get_uniform_int(attack_min_, attack_max_);
+					res->stat->health = generator::get_uniform_int(health_min_, health_max_);
+					res->stat->attack = generator::get_uniform_int(attack_min_, attack_max_);
 					res->stat->armour = armour_;
 					res->stat->name = name_;
 				}

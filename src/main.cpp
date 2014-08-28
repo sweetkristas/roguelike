@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 		bool running = true;
 
 		// XXX Try and load a save file here, including random seed. If no save file we generate a new seed
-		random::generate_seed();
+		generator::generate_seed();
 
 		font::manager font_manager;
 		graphics::texture::manager texture_manager(wm.get_renderer());
