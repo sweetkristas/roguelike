@@ -122,8 +122,8 @@ namespace particle
 			}
 		private:
 			void handle_create_particle(particle* p, float t) override {
-				p->pos.x += random::get_uniform_real<float>(0.0f, dims_.x) - dims_.x / 2;
-				p->pos.y += random::get_uniform_real<float>(0.0f, dims_.y) - dims_.y / 2;
+				p->pos.x += generator::get_uniform_real<float>(0.0f, dims_.x) - dims_.x / 2;
+				p->pos.y += generator::get_uniform_real<float>(0.0f, dims_.y) - dims_.y / 2;
 			}
 			// Dimensions of the square
 			pointf dims_;
@@ -152,7 +152,7 @@ namespace particle
 			void handle_create_particle(particle* p, float t) override {
 				float angle = 0.0f;
 				if(emit_random_) {
-					angle = random::get_uniform_real<float>(0.0f, static_cast<float>(2.0 * M_PI));
+					angle = generator::get_uniform_real<float>(0.0f, static_cast<float>(2.0 * M_PI));
 				} else {
 					angle = t * circle_step_;
 				}

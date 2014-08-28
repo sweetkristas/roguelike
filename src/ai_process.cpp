@@ -53,10 +53,10 @@ namespace process
 				update_turns_ = eng.get_turns() - update_turns_;
 				for(int n = 0; n != update_turns_; ++n) {
 					// XXX add some logic
-					if(random::get_uniform_int(0,1)) {
-						pos->mov.x += random::get_uniform_int(-1, 1);
+					if(generator::get_uniform_int(0,1)) {
+						pos->mov.x += generator::get_uniform_int(-1, 1);
 					} else {
-						pos->mov.y += random::get_uniform_int(-1, 1);
+						pos->mov.y += generator::get_uniform_int(-1, 1);
 					}
 				}
 			}
