@@ -10,15 +10,31 @@ namespace graphics
 {
 	namespace
 	{
-		std::map<std::string, texture>& texture_cache()
+		typedef std::map<std::string, std::shared_ptr<SDL_Texture>> texture_cache_type;
+
+		texture_cache_type& texture_cache()
 		{
-			static std::map<std::string, texture> res;
+			static texture_cache_type res;
+			return res;
+		}
+		
+		SDL_Renderer*& get_renderer()
+		{
+			static SDL_Renderer* res = nullptr;
 			return res;
 		}
 	}
 
-	texture::texture(SDL_Renderer* r)
-		: renderer_(r)
+	texture::manager::manager(SDL_Renderer* renderer)
+	{
+		get_renderer() = renderer;
+	}
+
+	texture::manager::~manager()
+	{
+	}
+
+	texture::texture()
 	{
 	}
 
@@ -31,34 +47,50 @@ namespace graphics
 
 	void texture::texture_from_surface(SDL_Surface* source, texture* tex)
 	{
+		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		SDL_SetSurfaceBlendMode(source, SDL_BLENDMODE_NONE);
 		// If the source area is empty then default to the whole image.
 		if(tex->area_.empty()) {
 			tex->area_ = rect(0, 0, source->w, source->h);
 		}
-		tex->tex_.reset(SDL_CreateTextureFromSurface(tex->renderer_, source), [](SDL_Texture* t) {
+		tex->tex_.reset(SDL_CreateTextureFromSurface(get_renderer(), source), [](SDL_Texture* t) {
 			SDL_DestroyTexture(t);
 		});
 	}
 
-	texture::texture(SDL_Renderer* r, const std::string& fname, TextureFlags flags, const rect& area)
+	texture::texture(const std::string& fname, TextureFlags flags, const rect& area)
 		: area_(area), 
 		  flags_(flags)
 	{
-		load_file_into_texture(fname, this);
+		if(flags & TextureFlags::NO_CACHE) {
+			load_file_into_texture(fname, this);
+			return;
+		}
+		auto it = texture_cache().find(fname);
+		if(it == texture_cache().end()) {
+			load_file_into_texture(fname, this);
+			texture_cache()[fname] = tex_;
+		} else {
+			tex_ = it->second;
+		}
 	}
 
-	texture::texture(SDL_Renderer* r, const surface& surf, TextureFlags flags, const rect& area)
+	texture::texture(const surface_ptr& surf, TextureFlags flags, const rect& area)
 		: area_(area), 
 		  flags_(flags)
 	{
-		texture_from_surface(const_cast<SDL_Surface*>(surf.get()), this);
+		texture_from_surface(const_cast<SDL_Surface*>(surf->get()), this);
 	}
 
 	void texture::rebuild_cache()
 	{
+		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		for(auto it = texture_cache().begin(); it != texture_cache().end(); ++it) {
-			load_file_into_texture(it->first, &it->second);
+			SDL_Surface* source = IMG_Load(it->first.c_str());
+			ASSERT_LOG(source != NULL, "Failed to load image: " << it->first << " : " << IMG_GetError());
+			it->second.reset(SDL_CreateTextureFromSurface(get_renderer(), source), [](SDL_Texture* t) {
+				SDL_DestroyTexture(t);
+			});
 		}
 	}
 
@@ -66,19 +98,23 @@ namespace graphics
 	{
 		set_area(area);
 		load_file_into_texture(fname, this);
+		if(!(flags_ & TextureFlags::NO_CACHE)) {
+			texture_cache()[fname] = tex_;
+		}
 	}
 
-	void texture::update(const surface& surf, const rect& area)
+	void texture::update(const surface_ptr& surf, const rect& area)
 	{
 		set_area(area);
-		texture_from_surface(const_cast<SDL_Surface*>(surf.get()), this);
+		texture_from_surface(const_cast<SDL_Surface*>(surf->get()), this);
 	}
 
 	void texture::blit(const rect& dest)
 	{
+		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		SDL_Rect src = {area_.x(), area_.y(), area_.w(), area_.h()};
-		SDL_Rect dst = {dest.x(), dest.y(), dest.w(), dest.h()};
-		SDL_RenderCopy(renderer_, tex_.get(), &src, &dst);
+		SDL_Rect dst = {dest.x(), dest.y(), dest.w() == 0 ? area_.w() : dest.w(), dest.h() == 0 ? area_.h() : dest.h()};
+		SDL_RenderCopy(get_renderer(), tex_.get(), &src, &dst);
 	}
 
 	void texture::set_area(const rect& area)

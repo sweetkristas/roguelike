@@ -15,6 +15,7 @@
 #include "asserts.hpp"
 #include "collision_process.hpp"
 #include "component.hpp"
+#include "creature.hpp"
 #include "engine.hpp"
 #include "font.hpp"
 #include "generate_cave.hpp"
@@ -73,10 +74,11 @@ void create_player(engine& e, const point& start)
 	player->mask |= component::genmask(component::Component::COLLISION);
 	player->pos = std::make_shared<component::position>(start);
 	e.set_camera(player->pos->pos);
-	player->stat = std::make_shared<component::stats>(10);
+	player->stat = std::make_shared<component::stats>();
+	player->stat->health = 10;
 	player->inp = std::make_shared<component::input>();
 	auto surf = font::render_shaded("@", fnt, graphics::color(255,255,255), graphics::color(255,0,0));
-	player->spr = std::make_shared<component::sprite>(e.get_renderer(), surf);
+	player->spr = std::make_shared<component::sprite>(std::make_shared<graphics::surface>(surf));
 	e.add_entity(player);
 
 	// Create GUI (needs player stats to we stick it in here for now)
@@ -86,7 +88,7 @@ void create_player(engine& e, const point& start)
 	gui->mask |= component::genmask(component::Component::STATS);
 	gui->mask |= component::genmask(component::Component::GUI);
 	gui->pos = std::make_shared<component::position>();
-	gui->spr = std::make_shared<component::sprite>(e.get_renderer(), nullptr);
+	gui->spr = std::make_shared<component::sprite>();
 	gui->stat = player->stat;
 	e.add_entity(gui);
 }
@@ -107,25 +109,6 @@ component_set_ptr create_world(engine& e)
 	auto chunks = world->map->t.get_chunks_in_area(area);
 	e.add_entity(world);
 	return world;
-}
-
-void create_goblin(engine& e)
-{
-	component_set_ptr mob = std::make_shared<component::component_set>(80);
-	// Player component simply acts as a tag for the entity
-	font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
-	mob->mask |= component::genmask(component::Component::ENEMY);
-	mob->mask |= component::genmask(component::Component::AI);
-	mob->mask |= component::genmask(component::Component::POSITION);
-	mob->mask |= component::genmask(component::Component::STATS);
-	mob->mask |= component::genmask(component::Component::SPRITE);
-	mob->mask |= component::genmask(component::Component::COLLISION);
-	mob->pos = std::make_shared<component::position>(point(4, 4));
-	mob->stat = std::make_shared<component::stats>(2);
-	mob->aip = std::make_shared<component::ai>();
-	auto surf = font::render_shaded("g", fnt, graphics::color(0,96,16), graphics::color(0,0,0));
-	mob->spr = std::make_shared<component::sprite>(e.get_renderer(), surf);
-	e.add_entity(mob);
 }
 
 int main(int argc, char* argv[])
@@ -173,15 +156,15 @@ int main(int argc, char* argv[])
 
 		bool running = true;
 
-		font::manager font_manager;
-
-		// Get some metrics about display size and font size to calculate how much we're showing at once.
-		auto fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
-
 		// XXX Try and load a save file here, including random seed. If no save file we generate a new seed
 		random::generate_seed();
 
+		font::manager font_manager;
+		graphics::texture::manager texture_manager(wm.get_renderer());
+
 		terrain::terrain::load_terrain_data(json::parse_from_file("data/terrain.cfg"));
+
+		creature::loader(json::parse_from_file("data/creatures.cfg"));
 
 		// XX engine should take the renderer as a parameter, expose it as a get function, then pass itself
 		// to the update function.
@@ -191,8 +174,9 @@ int main(int argc, char* argv[])
 		//create_player(e, cave->get()->map->start);
 
 		create_player(e, point(0, 0));
-		create_world(e);
-		create_goblin(e);
+		create_world(e);		
+		e.add_entity(creature::spawn("goblin", point(4, 4)));
+
 		e.add_process(std::make_shared<process::input>());
 		e.add_process(std::make_shared<process::render>());
 		e.add_process(std::make_shared<process::gui>());

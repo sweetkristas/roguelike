@@ -3,51 +3,63 @@
 
 namespace component
 {
-	sprite::sprite(SDL_Renderer* renderer, SDL_Surface* surf) 
-		: component(Component::SPRITE),
-		  tex(NULL)
+	Component get_component_from_string(const std::string& s)
 	{
-		if(surf != NULL) {
-			tex = SDL_CreateTextureFromSurface(renderer, surf);
-			ASSERT_LOG(tex != NULL, "Couldn't create texture from surface: " << SDL_GetError());
-			width = surf->w;
-			height = surf->h;
-			SDL_FreeSurface(surf);
+		if(s == "position") {
+			return Component::POSITION;
+		} else if(s == "sprite") {
+			return Component::SPRITE;
+		} else if(s == "stats") {
+			return Component::STATS;
+		} else if(s == "ai") {
+			return Component::AI;
+		} else if(s == "input") {
+			return Component::INPUT;
+		} else if(s == "lights") {
+			return Component::LIGHTS;
+		} else if(s == "map") {
+			return Component::MAP;
+		} else if(s == "player") {
+			return Component::PLAYER;
+		} else if(s == "enemy") {
+			return Component::ENEMY;
+		} else if(s == "gui") {
+			return Component::GUI;
+		} else if(s == "collision") {
+			return Component::COLLISION;
 		}
+		ASSERT_LOG(false, "Unrecognised component string '" << s << "'");
+		return static_cast<Component>(0);
+	}
+
+	sprite::sprite(const std::string& filename, const rect& area)
+		: component(Component::SPRITE),
+		  tex(filename, graphics::TextureFlags::NONE, area)
+	{
+	}
+
+	sprite::sprite(surface_ptr surf, const rect& area) 
+		: component(Component::SPRITE),
+		  tex(surf, graphics::TextureFlags::NONE, area)
+	{
 	}
 
 	sprite::~sprite()
 	{
-		if(tex != NULL) {
-			SDL_DestroyTexture(tex);
-		}
 	}
 
-	void sprite::update_texture(SDL_Renderer* renderer, SDL_Surface* surf)
+	void sprite::update_texture(surface_ptr surf)
 	{
-		if(tex != NULL) {
-			SDL_DestroyTexture(tex);
-		}
-		if(surf != NULL) {
-			tex = SDL_CreateTextureFromSurface(renderer, surf);
-			ASSERT_LOG(tex != NULL, "Couldn't create texture from surface: " << SDL_GetError());
-			width = surf->w;
-			height = surf->h;
-			SDL_FreeSurface(surf);
-		}
+		tex.update(surf);
 	}
 
 	lights::lights() 
-		: component(Component::LIGHTS), 
-		  tex(NULL)
+		: component(Component::LIGHTS)
 	{
 	}
 
 	lights::~lights()
 	{
-		if(tex != NULL) {
-			SDL_DestroyTexture(tex);
-		}
 	}
 
 	mapgrid::mapgrid()

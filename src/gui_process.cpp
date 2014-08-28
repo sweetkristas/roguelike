@@ -47,7 +47,7 @@ namespace process
 				// gui tagged entities get absolute pixel positioning for *free*.
 				pos->pos.x = 0;
 				pos->pos.y = eng.get_window().height() - surf->h;
-				spr->update_texture(eng.get_renderer(), surf);
+				spr->update_texture(std::make_shared<graphics::surface>(surf));
 			}
 		}
 	}

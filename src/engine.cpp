@@ -127,7 +127,7 @@ void engine::populate_quadtree()
 		if((e->mask & collision_map_mask) == collision_mask) {
 			auto& pos = e->pos->pos;
 			auto& spr = e->spr;
-			entity_quads_.insert(e, rect(pos.x, pos.y, spr->width, spr->height));
+			entity_quads_.insert(e, rect(pos.x, pos.y, tile_size_.x, tile_size_.y));
 		}
 	}
 }

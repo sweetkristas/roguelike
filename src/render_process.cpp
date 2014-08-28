@@ -28,16 +28,14 @@ namespace process
 			if((e->mask & gui_mask) == gui_mask) {
 				auto& spr = e->spr;
 				auto& pos = e->pos;
-				if(spr->tex != NULL) {
-					SDL_Rect dst = {pos->pos.x, pos->pos.y, spr->width, spr->height};
-					SDL_RenderCopy(eng.get_renderer(), spr->tex, NULL, &dst);
+				if(spr->tex.is_valid()) {
+					spr->tex.blit(rect(pos->pos.x, pos->pos.y, ts.x, ts.y));
 				}
 			}  else if((e->mask & sprite_mask) == sprite_mask) {
 				auto& spr = e->spr;
 				auto& pos = e->pos;
-				if(spr->tex != NULL) {
-					SDL_Rect dst = {screen_centre.x - (cam.x - pos->pos.x) * ts.x, screen_centre.y - (cam.y - pos->pos.y) * ts.y, spr->width, spr->height};
-					SDL_RenderCopy(eng.get_renderer(), spr->tex, NULL, &dst);
+				if(spr->tex.is_valid()) {
+					spr->tex.blit(rect(screen_centre.x - (cam.x - pos->pos.x) * ts.x, screen_centre.y - (cam.y - pos->pos.y) * ts.y, ts.x, ts.y));
 				}
 			} else if((e->mask & map_mask) == map_mask) {
 				auto& map = e->map;

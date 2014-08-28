@@ -16,6 +16,7 @@
     <ClCompile Include="..\src\collision_process.cpp" />
     <ClCompile Include="..\src\color.cpp" />
     <ClCompile Include="..\src\component.cpp" />
+    <ClCompile Include="..\src\creature.cpp" />
     <ClCompile Include="..\src\datetime.cpp" />
     <ClCompile Include="..\src\engine.cpp" />
     <ClCompile Include="..\src\filesystem.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="..\src\collision_process.hpp" />
     <ClInclude Include="..\src\color.hpp" />
     <ClInclude Include="..\src\component.hpp" />
+    <ClInclude Include="..\src\creature.hpp" />
     <ClInclude Include="..\src\datetime.hpp" />
     <ClInclude Include="..\src\dir_monitor.hpp" />
     <ClInclude Include="..\src\engine.hpp" />

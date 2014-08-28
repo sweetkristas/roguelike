@@ -12,7 +12,7 @@
 #include "map.hpp"
 #include "node.hpp"
 #include "terrain_generator.hpp"
-
+#include "texture.hpp"
 
 typedef std::bitset<64> component_id;
 
@@ -36,6 +36,8 @@ namespace component
 		MAX_COMPONENTS,
 	};
 	static_assert(static_cast<int>(Component::MAX_COMPONENTS) <= 64, "Maximum number of components must be less than 64. If you need more consider a vector<bool> solution.");
+
+	Component get_component_from_string(const std::string& s);
 
 	inline component_id operator<<(int value, const Component& rhs) 
 	{
@@ -68,24 +70,28 @@ namespace component
 
 	struct sprite : public component
 	{
-		sprite(SDL_Renderer* renderer, SDL_Surface* surf);
-		void update_texture(SDL_Renderer* renderer, SDL_Surface* surf);
+		sprite() : component(Component::SPRITE) {}
+		sprite(surface_ptr surf, const rect& area=rect());
+		sprite(const std::string& filename, const rect& area=rect());
 		~sprite();
-		SDL_Texture* tex;
-		int width;
-		int height;
+		void update_texture(surface_ptr surf);
+		graphics::texture tex;
 	};
 
 	struct stats : public component
 	{
-		stats(int hh) : component(Component::STATS), health(hh) {}
+		stats() : component(Component::STATS), health(1), attack(0), armour(0) {}
 		int health;
+		int attack;
+		int armour;
+		std::string name;
 	};
 
 	struct ai : public component
 	{
 		ai() : component(Component::AI) {}
 		// XXX Need to add some data
+		std::string type;
 	};
 
 	struct input : public component
@@ -118,7 +124,7 @@ namespace component
 		~lights();
 		// XXX These should in some sort of quadtree like structure.
 		std::vector<point_light> light_list;
-		SDL_Texture* tex;		
+		graphics::texture tex;		
 	};
 
 	struct mapgrid : public component
