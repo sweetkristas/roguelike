@@ -16,14 +16,23 @@ namespace process
 	void action::update(engine& eng, double t, const entity_list& elist)
 	{
 		using namespace component;
+		static component_id mask = genmask(Component::INPUT) | genmask(Component::POSITION);
 		for(auto& e : elist) {
-			if((e->mask & genmask(Component::INPUT)) == genmask(Component::INPUT)) {
+			if((e->mask & mask) == mask) {
 				auto& inp = e->inp;
-				switch (inp->action)
+				auto& pos = e->pos;
+
+				switch(inp->action)
 				{
 				case input::Action::none:	break;
 				case input::Action::moved:	
-					if((e->mask & genmask(Component::POSITION)) == genmask(Component::POSITION)) {
+					// Test to see if we moved but the collision detection failed it.
+					// XX there must be a better way.
+					if(pos->mov.x == 0 && pos->mov.y == 0) {
+						inp->action = input::Action::none;
+					} else {
+						e->pos->pos += e->pos->mov;
+						e->pos->mov.clear();
 						eng.set_camera(e->pos->pos);
 					}
 					break;

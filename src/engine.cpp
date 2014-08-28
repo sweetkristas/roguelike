@@ -151,6 +151,8 @@ bool engine::update(double time)
 		p->update(*this, time, entity_list_);
 	}
 
+	// Player move hack
+
 	particles_.update(static_cast<float>(time));
 	particles_.draw();
 	return true;

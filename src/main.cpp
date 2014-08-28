@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
 
 		create_player(e, point(0, 0));
 		create_world(e);		
-		e.add_entity(creature::spawn("goblin", point(4, 4)));
+		e.add_entity(creature::spawn("goblin", point(1, 1)));
 
 		e.add_process(std::make_shared<process::input>());
 		e.add_process(std::make_shared<process::render>());

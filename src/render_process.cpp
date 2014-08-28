@@ -29,7 +29,7 @@ namespace process
 				auto& spr = e->spr;
 				auto& pos = e->pos;
 				if(spr->tex.is_valid()) {
-					spr->tex.blit(rect(pos->pos.x, pos->pos.y, ts.x, ts.y));
+					spr->tex.blit(rect(pos->pos.x, pos->pos.y));
 				}
 			}  else if((e->mask & sprite_mask) == sprite_mask) {
 				auto& spr = e->spr;

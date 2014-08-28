@@ -40,6 +40,10 @@ namespace geometry
 		explicit Point(const std::vector<T>& v);
 		//variant write() const;
 		void clear() { x = T(0); y = T(0); }
+		void operator +=(const Point& p) {
+			x += p.x;
+			y += p.y;
+		}
 		union {
 			struct { T x, y; };
 			T buf[2];

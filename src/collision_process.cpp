@@ -36,18 +36,9 @@ namespace process
 					if((e2->mask & collision_mask) == collision_mask) {
 						// entity - entity collision
 						auto& e2pos = e2->pos;
-						if(e1pos->pos + e1pos->mov != e2pos->pos) {
-							e1pos->pos = e1pos->pos + e1pos->mov;
-						} else {
-							// XXX Not really sure I like this.
-							// Basically clears the action to no action if there was a collision.
-							// Needs to be applied for entity/map collision as well.
-							if((e1->mask & genmask(Component::INPUT)) == genmask(Component::INPUT)) {
-								auto& inp = e1->inp;
-								inp->action = input::Action::none;
-							}
-						}
-						e1pos->mov.clear();
+						if(e1pos->pos + e1pos->mov == e2pos->pos) {
+							e1pos->mov.clear();
+						}						
 					}
 				}
 			}
