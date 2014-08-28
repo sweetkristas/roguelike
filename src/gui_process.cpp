@@ -1,6 +1,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "component.hpp"
 #include "datetime.hpp"
 #include "engine.hpp"
 #include "font.hpp"
@@ -17,19 +18,20 @@ namespace process
 	{
 	}
 
-	void gui::update(engine& eng, double t, const std::vector<entity_ptr>& elist)
+	void gui::update(engine& eng, double t, const entity_list& elist)
 	{
+		using namespace component;
 		static component_id gui_mask
-			= (1 << component::Component::GUI)
-			| (1 << component::Component::STATS)
-			| (1 << component::Component::POSITION)
-			| (1 << component::Component::SPRITE);
+			= genmask(Component::GUI)
+			| genmask(Component::STATS)
+			| genmask(Component::POSITION)
+			| genmask(Component::SPRITE);
 		
 		for(auto& e : elist) {
-			if((e->get()->mask & gui_mask) == gui_mask) {
-				auto& stats = e->get()->stat;
-				auto& pos = e->get()->pos;
-				auto& spr = e->get()->spr;
+			if((e->mask & gui_mask) == gui_mask) {
+				auto& stats = e->stat;
+				auto& pos = e->pos;
+				auto& spr = e->spr;
 				auto fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
 				// XXX we should color code some of these
 				// i.e. as health gets lower it goes from green to red, to grey dead/unconscious

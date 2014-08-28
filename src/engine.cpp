@@ -19,15 +19,17 @@ engine::~engine()
 {
 }
 
-void engine::add_entity(entity_ptr e)
+void engine::add_entity(component_set_ptr e)
 {
 	entity_list_.emplace_back(e);
+	std::stable_sort(entity_list_.begin(), entity_list_.end());
 }
 
-void engine::remove_entity(entity_ptr e1)
+void engine::remove_entity(component_set_ptr e1)
 {
-	entity_list_.erase(std::remove_if(entity_list_.begin(), entity_list_.end(), 
-		[&e1](entity_ptr e2) { return e1 == e2; }), entity_list_.end());
+	entity_list_.erase(std::remove_if(entity_list_.begin(), entity_list_.end(), [&e1](component_set_ptr e2) {
+		return e1 == e2; 
+	}), entity_list_.end());
 }
 
 void engine::add_process(process::process_ptr s)
@@ -46,12 +48,6 @@ void engine::remove_process(process::process_ptr s)
 		[&s](process::process_ptr sp) { return sp == s; }), process_list_.end());
 }
 
-const point& engine::get_camera() 
-{ 
-	ASSERT_LOG(camera_ != nullptr, "Dereference null camera.");
-	return camera_->pos; 
-}
-
 void engine::process_events()
 {
 	SDL_Event evt;
@@ -63,6 +59,15 @@ void engine::process_events()
 			case SDL_QUIT:
 				set_state(EngineState::QUIT);
 				return;
+			case SDL_WINDOWEVENT:
+				claimed = true;
+				switch(evt.window.event) {
+					case SDL_WINDOWEVENT_RESIZED:
+						wm_.update_window_size();
+						break;
+					default: break;
+				}
+				break;
 			case SDL_KEYDOWN:
 				if(evt.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
 					set_state(EngineState::QUIT);
@@ -119,17 +124,17 @@ void engine::populate_quadtree()
 	static component_id collision_map_mask = collision_mask | (1 << component::Component::MAP);
 
 	for(auto& e : entity_list_) {
-		if((e->get()->mask & collision_map_mask) == collision_mask) {
-			auto& pos = e->get()->pos->pos;
-			auto& spr = e->get()->spr;
+		if((e->mask & collision_map_mask) == collision_mask) {
+			auto& pos = e->pos->pos;
+			auto& spr = e->spr;
 			entity_quads_.insert(e, rect(pos.x, pos.y, spr->width, spr->height));
 		}
 	}
 }
 
-std::vector<entity_ptr> engine::entities_in_area(const rect& r)
+entity_list engine::entities_in_area(const rect& r)
 {
-	std::vector<entity_ptr> res;
+	entity_list res;
 	entity_quads_.get_collidable(res, r);
 	return res;
 }

@@ -9,7 +9,7 @@ namespace process
 	public:
 		action();
 		~action();
-		void update(engine& eng, double t, const std::vector<entity_ptr>& elist);
+		void update(engine& eng, double t, const entity_list& elist) override;
 	private:
 	};
 }

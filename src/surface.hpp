@@ -23,6 +23,12 @@
 
 namespace graphics
 {
+	class surface;
+}
+typedef std::shared_ptr<graphics::surface> surface_ptr;
+
+namespace graphics
+{
 	class surface
 	{
 	public:
@@ -38,13 +44,11 @@ namespace graphics
 		int height() const { return surf_->h; }
 
 		// clipped blit
-		void blit_clipped(const surface& src, const rect& dst_rect);
+		void blit_clipped(const surface_ptr& src, const rect& dst_rect);
 		// scaled blit
-		void blit_scaled(const surface& src, const rect& dst_rect);
+		void blit_scaled(const surface_ptr& src, const rect& dst_rect);
 	private:
 		surface();
 		std::shared_ptr<SDL_Surface> surf_;
 	};
 }
-
-typedef std::shared_ptr<graphics::surface> surface_ptr;

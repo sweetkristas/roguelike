@@ -37,15 +37,15 @@ namespace graphics
 	{
 	}
 
-	void surface::blit_clipped(const surface& src, const rect& dst_rect)
+	void surface::blit_clipped(const surface_ptr& src, const rect& dst_rect)
 	{
 		SDL_Rect dr = {dst_rect.x(), dst_rect.y(), dst_rect.w(), dst_rect.h()};
-		SDL_BlitSurface(src.surf_.get(), NULL, surf_.get(), &dr);
+		SDL_BlitSurface(src->surf_.get(), NULL, surf_.get(), &dr);
 	}
 
-	void surface::blit_scaled(const surface& src, const rect& dst_rect)
+	void surface::blit_scaled(const surface_ptr& src, const rect& dst_rect)
 	{
 		SDL_Rect dr = {dst_rect.x(), dst_rect.y(), dst_rect.w(), dst_rect.h()};
-		SDL_BlitSurface(src.surf_.get(), NULL, surf_.get(), &dr);
+		SDL_BlitSurface(src->surf_.get(), NULL, surf_.get(), &dr);
 	}
 }

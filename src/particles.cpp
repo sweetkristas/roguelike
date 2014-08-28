@@ -1,22 +1,11 @@
 #include <algorithm>
 #include <limits>
-#include <random>
 
 #include "particles.hpp"
+#include "random.hpp"
 
 namespace particle
 {
-	namespace
-	{
-		const auto seed = std::default_random_engine()();
-		float get_random_float(float mn = 0.0f, float mx = 1.0f)
-		{
-			static std::mt19937 random_engine(seed);
-			std::uniform_real_distribution<float> uniform_dist(mn, mx);
-			return uniform_dist(random_engine);
-		}
-	}
-
 	particle_system_manager::particle_system_manager(SDL_Renderer* renderer)
 		: renderer_(renderer)
 	{
@@ -133,8 +122,8 @@ namespace particle
 			}
 		private:
 			void handle_create_particle(particle* p, float t) override {
-				p->pos.x += get_random_float(0.0f, dims_.x) - dims_.x / 2;
-				p->pos.y += get_random_float(0.0f, dims_.y) - dims_.y / 2;
+				p->pos.x += random::get_uniform_real<float>(0.0f, dims_.x) - dims_.x / 2;
+				p->pos.y += random::get_uniform_real<float>(0.0f, dims_.y) - dims_.y / 2;
 			}
 			// Dimensions of the square
 			pointf dims_;
@@ -163,7 +152,7 @@ namespace particle
 			void handle_create_particle(particle* p, float t) override {
 				float angle = 0.0f;
 				if(emit_random_) {
-					angle = get_random_float(0.0f, static_cast<float>(2.0 * M_PI));
+					angle = random::get_uniform_real<float>(0.0f, static_cast<float>(2.0 * M_PI));
 				} else {
 					angle = t * circle_step_;
 				}

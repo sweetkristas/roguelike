@@ -117,6 +117,11 @@ namespace graphics
 		//SDL_GL_SwapWindow(window_);		
 	}
 
+	void window_manager::update_window_size()
+	{
+		SDL_GetWindowSize(window_, &width_, &height_);
+	}
+
 	window_manager::~window_manager()
 	{
 		SDL_GL_DeleteContext(glcontext_);

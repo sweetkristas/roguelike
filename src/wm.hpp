@@ -14,6 +14,7 @@ namespace graphics
 		virtual ~window_manager();	
 		int width() const { return width_; }
 		int height() const { return height_; }
+		void update_window_size();
 	private:
 		SDL_Window* window_;
 		SDL_GLContext glcontext_;

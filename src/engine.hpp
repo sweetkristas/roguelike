@@ -1,13 +1,10 @@
 #pragma once
 
-#include <bitset>
-#include <vector>
-
-#include "component.hpp"
-#include "entity.hpp"
+#include "engine_fwd.hpp"
 #include "geometry.hpp"
 #include "particles.hpp"
 #include "process.hpp"
+#include "profile_timer.hpp"
 #include "quadtree.hpp"
 #include "wm.hpp"
 
@@ -27,15 +24,17 @@ public:
 	engine(graphics::window_manager& wm);
 	~engine();
 	
-	void add_entity(entity_ptr e);
-	void remove_entity(entity_ptr e);
+	void add_entity(component_set_ptr e);
+	void remove_entity(component_set_ptr e);
 
 	void add_process(process::process_ptr s);
 	void remove_process(process::process_ptr s);
 
 	graphics::window_manager& get_window() { return wm_; }
+	const graphics::window_manager& get_window() const { return wm_; }
 
 	SDL_Renderer* get_renderer() { return wm_.get_renderer(); }
+	const SDL_Renderer* get_renderer() const { return wm_.get_renderer(); }
 
 	void set_state(EngineState state) { state_ = state; }
 	EngineState get_state() const { return state_; }
@@ -45,12 +44,12 @@ public:
 	int get_turns() const { return turns_; }
 	void inc_turns(int cnt = 1);
 
-	void set_camera(const std::shared_ptr<component::position>& cam) { camera_ = cam; }
-	const point& get_camera();
+	void set_camera(const point& cam) { camera_ = cam; }
+	const point& get_camera() { return camera_; }
 
 	particle::particle_system_manager& get_particles() { return particles_; }
 
-	std::vector<entity_ptr> entities_in_area(const rect& r);
+	entity_list entities_in_area(const rect& r);
 
 	const point& get_tile_size() const { return tile_size_; }
 	void set_tile_size(const point& p) { tile_size_ = p; }
@@ -60,10 +59,10 @@ private:
 	void populate_quadtree();
 	EngineState state_;
 	int turns_;
-	std::shared_ptr<component::position> camera_;
+	point camera_;
 	graphics::window_manager& wm_;
-	std::vector<entity_ptr> entity_list_;
-	quadtree<entity_ptr> entity_quads_;
+	entity_list entity_list_;
+	quadtree<component_set_ptr> entity_quads_;
 	std::vector<process::process_ptr> process_list_;
 	point tile_size_;
 	particle::particle_system_manager particles_;

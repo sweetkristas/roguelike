@@ -1,3 +1,6 @@
+#include "SDL.h"
+
+#include "component.hpp"
 #include "input_process.hpp"
 
 namespace process
@@ -20,16 +23,16 @@ namespace process
 		return false;
 	}
 
-	void input::update(engine& eng, double t, const std::vector<entity_ptr>& elist)
+	void input::update(engine& eng, double t, const entity_list& elist)
 	{
-		static component_id input_mask
-			= (1 << component::Component::POSITION) 
-			| (1 << component::Component::INPUT);
+		static component_id input_mask 
+			= component::genmask(component::Component::POSITION) 
+			| component::genmask(component::Component::INPUT);
 		for(auto& e : elist) {
 
-			if((e->get()->mask & input_mask) == input_mask) {
-				auto& inp = e->get()->inp;
-				auto& pos = e->get()->pos;
+			if((e->mask & input_mask) == input_mask) {
+				auto& inp = e->inp;
+				auto& pos = e->pos;
 				inp->action = component::input::Action::none;
 				if(!keys_pressed_.empty()) {
 					auto key = keys_pressed_.front();

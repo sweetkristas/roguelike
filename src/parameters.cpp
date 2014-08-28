@@ -1,7 +1,6 @@
-#include <random>
-
 #include "asserts.hpp"
 #include "parameters.hpp"
+#include "random.hpp"
 
 namespace
 {
@@ -9,7 +8,6 @@ namespace
 	{
 	public:
 		random_parameter(const node& n) : min_(0.0f), max_(1.0f) {
-			seed_ = std::default_random_engine()();
 			if(n.has_key("min")) {
 				min_ = n["min"].as_float();
 			}
@@ -18,12 +16,9 @@ namespace
 			}
 		}
 		float get_value(float t) {
-			static std::mt19937 random_engine(seed_);
-			std::uniform_real_distribution<float> uniform_dist(min_, max_);
-			return uniform_dist(random_engine);
+			return random::get_uniform_real<float>(min_, max_);
 		}
 	private:
-		unsigned seed_;
 		float min_;
 		float max_;
 	};

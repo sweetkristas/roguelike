@@ -9,7 +9,7 @@ namespace process
 	public:
 		ee_collision();
 		~ee_collision();
-		void update(engine& eng, double t, const std::vector<entity_ptr>& elist);
+		void update(engine& eng, double t, const entity_list& elist) override;
 	};
 
 	class em_collision : public process
@@ -17,6 +17,6 @@ namespace process
 	public:
 		em_collision();
 		~em_collision();
-		void update(engine& eng, double t, const std::vector<entity_ptr>& elist);
+		void update(engine& eng, double t, const entity_list& elist) override;
 	};
 }

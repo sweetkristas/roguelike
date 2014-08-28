@@ -1,18 +1,17 @@
 #pragma once
 
-#include <memory>
+#include "SDL.h"
 
-#include "entity.hpp"
-
-class engine;
+#include "engine_fwd.hpp"
 
 namespace process
 {
 	enum class ProcessPriority {
 		input			= 100,
-		ai				= 300,
-		collision		= 700,
-		action			= 800,
+		ai				= 200,
+		collision		= 600,
+		action			= 700,
+		world			= 800,
 		gui			    = 850,
 		render			= 900
 	};
@@ -25,7 +24,7 @@ namespace process
 		virtual ~process();
 		virtual void start() {}
 		virtual void end() {}
-		virtual void update(engine& eng, double t, const std::vector<entity_ptr>& elist) = 0;
+		virtual void update(engine& eng, double t, const entity_list& elist) = 0;
 
 		bool process_event(const SDL_Event& evt);
 		ProcessPriority get_priority() const { return priority_; }

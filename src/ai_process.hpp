@@ -9,7 +9,7 @@ namespace process
 	public:
 		ai();
 		~ai();
-		void update(engine& eng, double t, const std::vector<entity_ptr>& elist);
+		void update(engine& eng, double t, const entity_list& elist) override;
 	private:
 		bool handle_event(const SDL_Event& evt);
 		bool should_update_;

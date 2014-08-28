@@ -123,18 +123,15 @@ namespace component
 
 	struct mapgrid : public component
 	{
-		//mapgrid(const node& n);
 		mapgrid();
 		terrain::terrain t;
-		//point start;
-		// XXX need to know where exits are linked to.
-		//std::vector<point> exits;
-		//map_type map;
 	};
 
 	struct component_set
 	{
+		component_set(int z=0) : mask(component_id(0)), zorder(z) {}
 		component_id mask;
+		int zorder;
 		std::shared_ptr<position> pos;
 		std::shared_ptr<sprite> spr;
 		std::shared_ptr<stats> stat;
@@ -144,5 +141,9 @@ namespace component
 		bool is_player() { return (mask & genmask(Component::PLAYER)) == genmask(Component::PLAYER); }
 	};
 	typedef std::shared_ptr<component_set> component_set_ptr;
+	
+	inline bool operator<(const component_set_ptr& lhs, const component_set_ptr& rhs)
+	{
+		return lhs->zorder == rhs->zorder ? lhs.get() < rhs.get() : lhs->zorder < rhs->zorder;
+	}
 }
-
