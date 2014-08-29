@@ -35,7 +35,7 @@ namespace gui
 	private:
 		virtual void handle_update(double t) {}
 		virtual void handle_draw(const point& p, float rotation, float scale) const {}
-		virtual bool handle_events(SDL_Event* evt, bool claimed) {}
+		virtual bool handle_events(SDL_Event* evt, bool claimed) { return claimed; }
 		rect area_;
 		int zorder_;
 		float rotation_;

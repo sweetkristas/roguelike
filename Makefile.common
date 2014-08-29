@@ -7,11 +7,13 @@
 objects = \
 	src/action_process.o \
 	src/ai_process.o \
+	src/button.o \
 	src/collision_process.o \
 	src/color.o \
 	src/component.o \
 	src/creature.o \
 	src/datetime.o \
+	src/dialog.o \
 	src/engine.o \
 	src/filesystem.o \
 	src/font.o \
@@ -33,5 +35,7 @@ objects = \
 	src/surface.o \
 	src/terrain_generator.o \
 	src/texture.o \
+	src/tile.o \
 	src/unit_test.o \
+	src/widget.o \
 	src/wm.o
