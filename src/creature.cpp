@@ -100,6 +100,11 @@ namespace creature
 				if((component_mask_ & genmask(Component::LIGHTS)) == genmask(Component::LIGHTS)) {
 					// XXX?
 				}
+				if((component_mask_ & genmask(Component::INPUT)) == genmask(Component::INPUT)) {
+					res->inp = std::make_shared<input>();
+					res->inp->action = input::Action::none;
+				}
+				res->mask = component_mask_;
 				return res;
 			}
 		private:

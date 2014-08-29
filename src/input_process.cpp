@@ -27,7 +27,8 @@ namespace process
 	{
 		static component_id input_mask 
 			= component::genmask(component::Component::POSITION) 
-			| component::genmask(component::Component::INPUT);
+			| component::genmask(component::Component::INPUT)
+			| component::genmask(component::Component::PLAYER);
 		for(auto& e : elist) {
 
 			if((e->mask & input_mask) == input_mask) {

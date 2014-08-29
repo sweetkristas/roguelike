@@ -33,7 +33,9 @@ namespace process
 					} else {
 						e->pos->pos += e->pos->mov;
 						e->pos->mov.clear();
-						eng.set_camera(e->pos->pos);
+						if(e->is_player()) {
+							eng.set_camera(e->pos->pos);
+						}
 					}
 					break;
 				case input::Action::pass:	break;
