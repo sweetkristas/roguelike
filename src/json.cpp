@@ -323,11 +323,13 @@ namespace json
 				node token_value;
 				boost::tie(tok, token_value) = lex.get_next_token();
 				if(lexer::is_simple_value(tok)) {
-					res.push_back(token_value);
+					res.push_back(token_value);				
 				} else if(tok == lexer::LEFT_BRACE) {
 					res.push_back(read_object(lex));
 				} else if(tok == lexer::LEFT_BRACKET) {
 					res.push_back(read_array(lex));
+				} else if(tok == lexer::RIGHT_BRACKET) {
+					return node(&res);
 				} else {
 					throw parse_error(formatter() << "Expected colon ':' found " << lexer::token_as_string(tok));
 				}
@@ -343,7 +345,7 @@ namespace json
 					}
 				}
 			}
-			return node(res);
+			return node(&res);
 		}
 
 		node read_object(lexer& lex)
@@ -355,7 +357,10 @@ namespace json
 				node token_value;
 				boost::tie(tok, token_value) = lex.get_next_token();
 				node key;
-				if(tok == lexer::LITERAL || tok == lexer::STRING_LITERAL) {
+				if(tok == lexer::RIGHT_BRACE) {
+					// empty map
+					return node(&res);
+				} else if(tok == lexer::LITERAL || tok == lexer::STRING_LITERAL) {
 					key = token_value;
 				} else {
 					throw parse_error(formatter() << "Unexpected token type: " << lexer::token_as_string(tok) << " expected string or literal");
@@ -386,7 +391,7 @@ namespace json
 					}
 				}
 			}
-			return node(res);
+			return node(&res);
 		}
 	}
 
