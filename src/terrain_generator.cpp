@@ -20,22 +20,27 @@ namespace terrain
 		class tile
 		{
 		public:
-			tile(float threshold, TerrainType tt, const std::string& name, const std::string& image) 
+			tile(float threshold, TerrainType tt, const std::string& name, const std::string& image, const std::string& transitions_file) 
 				: threshold_(threshold), 
 				  terrain_type_(tt), 
 				  name_(name) 
 			{
-				surface_.reset(new graphics::surface(image));
+				surface_ = std::make_shared<graphics::surface>(image);
+				if(!transitions_file.empty()) {
+					transitions_ = std::make_shared<graphics::surface>(transitions_file);
+				}
 			}
 			TerrainType get_terrain_type() const { return terrain_type_; }
 			float get_threshold() const { return threshold_; }
 			const std::string& get_name() const { return name_; }
 			surface_ptr get_surface() { return surface_; }
+			surface_ptr get_transitions() { return transitions_; }
 		private:
 			float threshold_;
 			TerrainType terrain_type_;
 			std::string name_;
 			surface_ptr surface_;
+			surface_ptr transitions_;
 		};
 		inline bool operator<(const tile& lhs, const tile& rhs) { return lhs.get_threshold() < rhs.get_threshold(); }
 
@@ -180,7 +185,11 @@ namespace terrain
 			const auto& image = t.second["image"].as_string();
 			ASSERT_LOG(t.second.has_key("gradient"), "tiles must have 'gradient' attribute");
 			const auto& gradient = t.second["gradient"].as_float();
-			td.add_tile(tile(gradient, counter++, name, image));
+			std::string transitions_file;
+			if(t.second.has_key("transitions")) {
+				transitions_file = t.second["transitions"].as_string();
+			}
+			td.add_tile(tile(gradient, counter++, name, image, transitions_file));
 		}
 
 		td.sort_tiles();
