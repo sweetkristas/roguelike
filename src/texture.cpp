@@ -48,7 +48,8 @@ namespace graphics
 	void texture::texture_from_surface(SDL_Surface* source, texture* tex)
 	{
 		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
-		SDL_SetSurfaceBlendMode(source, SDL_BLENDMODE_NONE);
+		SDL_SetSurfaceBlendMode(source, SDL_BLENDMODE_BLEND);
+		//SDL_SetSurfaceBlendMode(source, SDL_BLENDMODE_NONE);
 		// If the source area is empty then default to the whole image.
 		if(tex->area_.empty()) {
 			tex->area_ = rect(0, 0, source->w, source->h);
@@ -88,6 +89,7 @@ namespace graphics
 		for(auto it = texture_cache().begin(); it != texture_cache().end(); ++it) {
 			SDL_Surface* source = IMG_Load(it->first.c_str());
 			ASSERT_LOG(source != NULL, "Failed to load image: " << it->first << " : " << IMG_GetError());
+			SDL_SetSurfaceBlendMode(source, SDL_BLENDMODE_BLEND);
 			it->second.reset(SDL_CreateTextureFromSurface(get_renderer(), source), [](SDL_Texture* t) {
 				SDL_DestroyTexture(t);
 			});
