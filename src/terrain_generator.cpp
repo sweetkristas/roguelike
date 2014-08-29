@@ -15,6 +15,8 @@ namespace terrain
 {
 	namespace
 	{
+		const double terrain_scale_factor = 8.0;
+
 		class tile
 		{
 		public:
@@ -218,14 +220,13 @@ namespace terrain
 	{
 		using namespace noise;
 		module::Perlin pnoise;
-		const double scale = 4.0;
 		pnoise.SetSeed(static_cast<int>(generator::get_seed()));
 		chunk_ptr nchunk = std::make_shared<chunk>(pos, chunk_size_w_, chunk_size_h_);
 		for(int y = 0; y < chunk_size_h_; ++y) {
 			for(int x = 0; x < chunk_size_w_; ++x) {
 				auto ns = pnoise.GetValue(
-					(x + pos.x - chunk_size_w_ / 2.0) / (chunk_size_w_ * scale),
-					(y + pos.y - chunk_size_h_ / 2.0) / (chunk_size_h_ * scale),
+					(x + pos.x - chunk_size_w_ / 2.0) / (chunk_size_w_ * terrain_scale_factor),
+					(y + pos.y - chunk_size_h_ / 2.0) / (chunk_size_h_ * terrain_scale_factor),
 					0.0);
 				nchunk->set_at(x, y, static_cast<float>(ns));
 			}
