@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Widgets">
+      <UniqueIdentifier>{1c9d0e75-adb9-4707-8d80-8f86b8c1d81b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Widgets">
+      <UniqueIdentifier>{f4ded80d-1157-45f4-99bf-1d74d2e09988}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -104,6 +110,21 @@
     </ClCompile>
     <ClCompile Include="..\src\creature.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tiles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\button.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dialog.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\widget.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\label.cpp">
+      <Filter>Source Files\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -229,6 +250,21 @@
     </ClInclude>
     <ClInclude Include="..\src\creature.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\button.hpp">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dialog.hpp">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widget.hpp">
+      <Filter>Header Files\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\label.hpp">
+      <Filter>Header Files\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
