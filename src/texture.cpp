@@ -60,7 +60,6 @@ namespace graphics
 		tex->tex_.reset(ntex, [](SDL_Texture* t) {
 			SDL_DestroyTexture(t);
 		});
-		SDL_UpdateTexture(ntex, NULL, source->pixels, source->pitch);
 	}
 
 	texture::texture(const std::string& fname, TextureFlags flags, const rect& area)
@@ -81,12 +80,13 @@ namespace graphics
 	}
 
 	texture::texture(int w, int h, TextureFlags flags)
-		: flags_(flags)
+		: flags_(flags),
+		  area_(rect(0, 0, w, h))
 	{
 		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		auto ntex = SDL_CreateTexture(get_renderer(), 
-			SDL_PIXELFORMAT_ABGR8888, 
-			flags_ & TextureFlags::TARGET ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STATIC, 
+			SDL_PIXELFORMAT_ARGB8888, 
+			(flags_ & TextureFlags::TARGET) ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STATIC, 
 			w, 
 			h);
 		ASSERT_LOG(ntex != nullptr, "Couldn't create texture: " << SDL_GetError());
@@ -135,7 +135,8 @@ namespace graphics
 		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		SDL_Rect src = {area_.x(), area_.y(), area_.w(), area_.h()};
 		SDL_Rect dst = {dest.x(), dest.y(), dest.w() == 0 ? area_.w() : dest.w(), dest.h() == 0 ? area_.h() : dest.h()};
-		SDL_RenderCopy(get_renderer(), tex_.get(), &src, &dst);
+		int res = SDL_RenderCopy(get_renderer(), tex_.get(), &src, &dst);
+		ASSERT_LOG(res == 0, "Failed to blit texture: " << SDL_GetError());
 	}
 
 	void texture::set_area(const rect& area)

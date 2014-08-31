@@ -187,20 +187,22 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::ee_collision>());
 
 		graphics::texture darkness(wm.width(), wm.height(), graphics::TextureFlags::NO_CACHE | graphics::TextureFlags::TARGET);
-		SDL_SetTextureBlendMode(darkness.get(), SDL_BLENDMODE_ADD);
+		graphics::texture light("images/light.png", graphics::TextureFlags::NONE);
+		SDL_SetTextureBlendMode(light.get(), SDL_BLENDMODE_BLEND);
+		SDL_SetTextureBlendMode(darkness.get(), SDL_BLENDMODE_MOD);
 		SDL_SetRenderTarget(wm.get_renderer(), darkness.get());
-		SDL_SetRenderDrawColor(wm.get_renderer(), 16, 16, 96, 172);
+		SDL_SetRenderDrawColor(wm.get_renderer(), 16, 16, 32, 224);
 		SDL_RenderClear(wm.get_renderer());
+		light.blit(rect((wm.width()-e.get_tile_size().x*4)/2, (wm.height()-e.get_tile_size().y*4)/2, e.get_tile_size().x*4, e.get_tile_size().y*4));
 
 		SDL_SetRenderTarget(wm.get_renderer(), NULL);
-		SDL_SetRenderDrawColor(wm.get_renderer(), 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(wm.get_renderer(), 255, 255, 255, 255);
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();
 			profile::timer tm;
 
 			SDL_RenderClear(wm.get_renderer());
 			running = e.update(60.0/1000.0);
-			darkness.blit(rect(0,0,wm.width(), wm.height()));
 			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
 	

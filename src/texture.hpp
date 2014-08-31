@@ -19,7 +19,7 @@ namespace graphics
 
 	inline bool operator&(TextureFlags lhs, TextureFlags rhs)
 	{
-		return ((static_cast<int>(lhs) & static_cast<int>(rhs)) == static_cast<int>(lhs));
+		return ((static_cast<int>(lhs) & static_cast<int>(rhs)) == static_cast<int>(rhs));
 	}
 
 	class texture

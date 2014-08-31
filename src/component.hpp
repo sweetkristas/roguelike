@@ -124,7 +124,7 @@ namespace component
 		~lights();
 		// XXX These should in some sort of quadtree like structure.
 		std::vector<point_light> light_list;
-		graphics::texture tex;		
+		graphics::texture tex;
 	};
 
 	struct mapgrid : public component
