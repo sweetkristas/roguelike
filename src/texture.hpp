@@ -32,6 +32,7 @@ namespace graphics
 		};
 
 		texture();
+		explicit texture(int w, int h, TextureFlags flags);
 		explicit texture(const std::string& fname, TextureFlags flags, const rect& area=rect());
 		explicit texture(const surface_ptr& surf, TextureFlags flags, const rect& area=rect());
 

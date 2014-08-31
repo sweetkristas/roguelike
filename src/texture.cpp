@@ -55,11 +55,7 @@ namespace graphics
 			tex->area_ = rect(0, 0, source->w, source->h);
 		}
 		
-		auto ntex = SDL_CreateTexture(get_renderer(), 
-			source->format->format, 
-			tex->flags_ & TextureFlags::TARGET ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STATIC, 
-			source->w, 
-			source->h);
+		auto ntex = SDL_CreateTextureFromSurface(get_renderer(), source);
 		ASSERT_LOG(ntex != nullptr, "Couldn't create texture: " << SDL_GetError());
 		tex->tex_.reset(ntex, [](SDL_Texture* t) {
 			SDL_DestroyTexture(t);
@@ -82,6 +78,21 @@ namespace graphics
 		} else {
 			tex_ = it->second;
 		}
+	}
+
+	texture::texture(int w, int h, TextureFlags flags)
+		: flags_(flags)
+	{
+		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
+		auto ntex = SDL_CreateTexture(get_renderer(), 
+			SDL_PIXELFORMAT_ABGR8888, 
+			flags_ & TextureFlags::TARGET ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STATIC, 
+			w, 
+			h);
+		ASSERT_LOG(ntex != nullptr, "Couldn't create texture: " << SDL_GetError());
+		tex_.reset(ntex, [](SDL_Texture* t) {
+			SDL_DestroyTexture(t);
+		});
 	}
 
 	texture::texture(const surface_ptr& surf, TextureFlags flags, const rect& area)

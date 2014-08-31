@@ -186,9 +186,8 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::em_collision>());
 		e.add_process(std::make_shared<process::ee_collision>());
 
-		surface_ptr darkness_s = std::make_shared<graphics::surface>(wm.width(), wm.height());
-		graphics::texture darkness(darkness_s, graphics::TextureFlags::NO_CACHE | graphics::TextureFlags::TARGET);
-		//SDL_GetTextureBlendMode(darkness.get(), SDL_BLENDMODE_ADD);
+		graphics::texture darkness(wm.width(), wm.height(), graphics::TextureFlags::NO_CACHE | graphics::TextureFlags::TARGET);
+		SDL_SetTextureBlendMode(darkness.get(), SDL_BLENDMODE_ADD);
 		SDL_SetRenderTarget(wm.get_renderer(), darkness.get());
 		SDL_SetRenderDrawColor(wm.get_renderer(), 16, 16, 96, 172);
 		SDL_RenderClear(wm.get_renderer());
@@ -201,6 +200,7 @@ int main(int argc, char* argv[])
 
 			SDL_RenderClear(wm.get_renderer());
 			running = e.update(60.0/1000.0);
+			darkness.blit(rect(0,0,wm.width(), wm.height()));
 			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
 	
