@@ -317,8 +317,8 @@ namespace terrain
 		// But it is in the same units as pos_ is;
 
 		SDL_Rect dst = {
-			(pos_.x - cam.x) * eng.get_tile_size().x - chunk_surface_->width() / 2 + eng.get_window().width() / 2,
-			(pos_.y - cam.y) * eng.get_tile_size().y - chunk_surface_->height() / 2 + eng.get_window().height() / 2,
+			(pos_.x - cam.x) * eng.get_tile_size().x - chunk_surface_->width() / 2 + eng.get_window().width() / 2 - eng.get_tile_size().x/2,
+			(pos_.y - cam.y) * eng.get_tile_size().y - chunk_surface_->height() / 2 + eng.get_window().height() / 2 - eng.get_tile_size().y/2,
 			chunk_surface_->width(),
 			chunk_surface_->height()
 		};

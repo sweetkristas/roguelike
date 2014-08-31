@@ -35,7 +35,7 @@ namespace process
 				auto& spr = e->spr;
 				auto& pos = e->pos;
 				if(spr->tex.is_valid()) {
-					spr->tex.blit(rect(screen_centre.x - (cam.x - pos->pos.x) * ts.x, screen_centre.y - (cam.y - pos->pos.y) * ts.y, ts.x, ts.y));
+					spr->tex.blit(rect(screen_centre.x - (cam.x - pos->pos.x) * ts.x - ts.x/2, screen_centre.y - (cam.y - pos->pos.y) * ts.y - ts.y/2, ts.x, ts.y));
 				}
 			} else if((e->mask & map_mask) == map_mask) {
 				auto& map = e->map;

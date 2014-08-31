@@ -111,9 +111,6 @@
     <ClCompile Include="..\src\creature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\tiles.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\button.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
@@ -125,6 +122,9 @@
     </ClCompile>
     <ClCompile Include="..\src\label.cpp">
       <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tile.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

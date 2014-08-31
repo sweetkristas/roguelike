@@ -42,7 +42,7 @@
     <ClCompile Include="..\src\surface.cpp" />
     <ClCompile Include="..\src\terrain_generator.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
-    <ClCompile Include="..\src\tiles.cpp" />
+    <ClCompile Include="..\src\tile.cpp" />
     <ClCompile Include="..\src\unit_test.cpp" />
     <ClCompile Include="..\src\widget.cpp" />
     <ClCompile Include="..\src\wm.cpp" />
