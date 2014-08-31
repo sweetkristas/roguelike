@@ -6,12 +6,16 @@
 #include "SDL.h"
 
 #if defined(_MSC_VER)
+#include <intrin.h>
+#define DebuggerBreak()		do{ __debugbreak(); } while(0)
 #define __SHORT_FORM_OF_FILE__		\
 	(strrchr(__FILE__, '\\')		\
 	? strrchr(__FILE__, '\\') + 1	\
 	: __FILE__						\
 	)
 #else
+#include <signal.h>
+#define DebuggerBreak()		do{ raise(SIGINT); }while(0)
 #define __SHORT_FORM_OF_FILE__		\
 	(strrchr(__FILE__, '/')			\
 	? strrchr(__FILE__, '/') + 1	\
@@ -25,6 +29,7 @@
 			std::ostringstream _s;													\
 			_s << __SHORT_FORM_OF_FILE__ << ":" << __LINE__ << " : " << _b;			\
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s\n", _s.str().c_str());\
+			DebuggerBreak();														\
 			exit(1);																\
 		}																			\
 	} while(0)

@@ -5,7 +5,7 @@ namespace tile
 	namespace 
 	{
 		// Maps from the 256 possible combinations down to the "standard" 47 tile combinations.
-#if defined(_MSC_VC) && _MSC_VER <= 1700
+#if defined(_MSC_VER) && _MSC_VER <= 1700
 		// No initialiser lists in VS2012 or lower.
 		const int tile_mapping[256] = {
 #else

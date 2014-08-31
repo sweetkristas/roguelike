@@ -44,9 +44,10 @@ namespace graphics
 		int height() const { return surf_->h; }
 
 		// clipped blit
-		void blit_clipped(const surface_ptr& src, const rect& dst_rect);
+		void blit_clipped(const surface_ptr& src, const rect& dst_rect=rect());
 		// scaled blit
 		void blit_scaled(const surface_ptr& src, const rect& dst_rect);
+		void blit_scaled(const surface_ptr& src, const rect& src_rect, const rect& dst_rect);
 	private:
 		surface();
 		std::shared_ptr<SDL_Surface> surf_;

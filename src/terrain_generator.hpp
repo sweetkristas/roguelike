@@ -17,35 +17,64 @@ namespace terrain
 	class chunk;
 	typedef std::shared_ptr<chunk> chunk_ptr;
 
+	struct point_hash
+	{
+		std::size_t operator()(const point& p) const;
+	};
+	typedef std::unordered_map<point, chunk_ptr, point_hash> terrain_map_type;
+
+
+	class terrain_tile
+	{
+	public:
+		terrain_tile(float threshold, TerrainType tt, 
+			const std::string& name, 
+			const std::string& image, 
+			const std::string& transitions_file);
+		TerrainType get_terrain_type() const { return terrain_type_; }
+		float get_threshold() const { return threshold_; }
+		const std::string& get_name() const { return name_; }
+		surface_ptr get_surface() { return surface_; }
+		surface_ptr get_transitions() { return transitions_; }
+	private:
+		float threshold_;
+		TerrainType terrain_type_;
+		std::string name_;
+		surface_ptr surface_;
+		surface_ptr transitions_;
+	};
+	typedef std::shared_ptr<terrain_tile> terrain_tile_ptr;
+	inline bool operator<(const terrain_tile& lhs, const terrain_tile& rhs) { return lhs.get_threshold() < rhs.get_threshold(); }
+	inline bool operator<(const terrain_tile_ptr& lhs, const terrain_tile_ptr& rhs) { return *lhs < *rhs; }
+
 	class chunk
 	{
 	public:
 		chunk(const point& pos, int width, int height);
 		~chunk();
 		void set_at(int x, int y, float tt);
-		float get_at(int x, int y);
+		terrain_tile_ptr get_at(int x, int y);
+		TerrainType get_terrain_at(int x, int y);
 		int width() const { return width_; }
 		int height() const { return height_; }
-		const point& position() const { return pos_; }
+		const point& get_position() const { return pos_; }
 		void set_surface(surface_ptr surf) { chunk_surface_ = surf; }
 		surface_ptr get_surface() { return chunk_surface_; }
+		void set_transitions_surface(surface_ptr surf) { transitions_surface_ = surf; }
+		surface_ptr get_transitions_surface() { return transitions_surface_; }
 		static surface_ptr make_surface_from_chunk(chunk_ptr chk);
 		void draw(const engine& eng, const point& cam) const;
 	private:
 		point pos_;
 		int width_;
 		int height_;
-		std::vector<std::vector<float>> terrain_;
+		std::vector<std::vector<terrain_tile_ptr>> terrain_;
 		// should make this a texture.
 		surface_ptr chunk_surface_;
+		surface_ptr transitions_surface_;
 		mutable SDL_Texture* texture_;
 	};
 	typedef std::shared_ptr<chunk> chunk_ptr;
-
-	struct point_hash
-	{
-		std::size_t operator()(const point& p) const;
-	};
 
 	class terrain
 	{
@@ -59,6 +88,8 @@ namespace terrain
 
 		// Pos is the worldspace position.
 		chunk_ptr generate_terrain_chunk(const point& pos);
+		terrain_tile_ptr get_tile_at(const point& p);
+		surface_ptr build_transitions(chunk_ptr chk);
 
 		static void load_terrain_data(const node& n);
 		static point get_terrain_size();
@@ -66,6 +97,6 @@ namespace terrain
 	private:
 		int chunk_size_w_;
 		int chunk_size_h_;
-		std::unordered_map<point, chunk_ptr, point_hash> chunks_;
+		terrain_map_type chunks_;
 	};
 }
