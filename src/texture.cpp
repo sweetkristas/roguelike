@@ -54,9 +54,17 @@ namespace graphics
 		if(tex->area_.empty()) {
 			tex->area_ = rect(0, 0, source->w, source->h);
 		}
-		tex->tex_.reset(SDL_CreateTextureFromSurface(get_renderer(), source), [](SDL_Texture* t) {
+		
+		auto ntex = SDL_CreateTexture(get_renderer(), 
+			source->format->format, 
+			tex->flags_ & TextureFlags::TARGET ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STATIC, 
+			source->w, 
+			source->h);
+		ASSERT_LOG(ntex != nullptr, "Couldn't create texture: " << SDL_GetError());
+		tex->tex_.reset(ntex, [](SDL_Texture* t) {
 			SDL_DestroyTexture(t);
 		});
+		SDL_UpdateTexture(ntex, NULL, source->pixels, source->pitch);
 	}
 
 	texture::texture(const std::string& fname, TextureFlags flags, const rect& area)

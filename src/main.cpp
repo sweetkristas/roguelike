@@ -186,6 +186,15 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::em_collision>());
 		e.add_process(std::make_shared<process::ee_collision>());
 
+		surface_ptr darkness_s = std::make_shared<graphics::surface>(wm.width(), wm.height());
+		graphics::texture darkness(darkness_s, graphics::TextureFlags::NO_CACHE | graphics::TextureFlags::TARGET);
+		//SDL_GetTextureBlendMode(darkness.get(), SDL_BLENDMODE_ADD);
+		SDL_SetRenderTarget(wm.get_renderer(), darkness.get());
+		SDL_SetRenderDrawColor(wm.get_renderer(), 16, 16, 96, 172);
+		SDL_RenderClear(wm.get_renderer());
+
+		SDL_SetRenderTarget(wm.get_renderer(), NULL);
+		SDL_SetRenderDrawColor(wm.get_renderer(), 0, 0, 0, 255);
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();
 			profile::timer tm;

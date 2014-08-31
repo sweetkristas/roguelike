@@ -9,6 +9,7 @@ namespace graphics
 	{
 		NONE		= 0,
 		NO_CACHE	= 1,
+		TARGET		= 2,
 	};
 	
 	inline TextureFlags operator|(TextureFlags lhs, TextureFlags rhs)
@@ -39,6 +40,8 @@ namespace graphics
 
 		void update(const std::string& fname, const rect& area = rect());
 		void update(const surface_ptr& surf, const rect& area = rect());
+
+		SDL_Texture* get() { return tex_.get(); }
 
 		bool is_valid() { return tex_ != nullptr; }
 
