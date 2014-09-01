@@ -22,6 +22,23 @@ namespace graphics
 		return ((static_cast<int>(lhs) & static_cast<int>(rhs)) == static_cast<int>(rhs));
 	}
 
+	enum class FlipFlags
+	{
+		NONE		= 0,
+		HORIZONTAL	= 1,
+		VERTICAL	= 2,
+	};
+
+	inline FlipFlags operator|(FlipFlags lhs, FlipFlags rhs)
+	{
+		return static_cast<FlipFlags>(static_cast<int>(lhs) | static_cast<int>(rhs));
+	}
+
+	inline bool operator&(FlipFlags lhs, FlipFlags rhs)
+	{
+		return ((static_cast<int>(lhs) & static_cast<int>(rhs)) == static_cast<int>(rhs));
+	}
+
 	class texture
 	{
 	public:
@@ -49,8 +66,11 @@ namespace graphics
 		void set_name(const std::string& name) { name_ = name; }
 		const std::string& get_name() const { return name_; }
 
-		void blit(const rect& dst);
-		//void blit_ex(SDL_Renderer* renderer, const rect& dst, double angle, const point& center, FlipFlags flip);
+		int width() const { return area_.w(); }
+		int height() const { return area_.h(); }
+
+		void blit(const rect& dst) const;
+		void blit_ex(const rect& dst, double angle, const point& center, FlipFlags flip) const;
 		static void rebuild_cache();
 	private:
 		static void texture_from_surface(SDL_Surface* source, texture* tex);

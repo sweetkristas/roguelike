@@ -30,7 +30,6 @@ namespace process
 			| component::genmask(component::Component::INPUT)
 			| component::genmask(component::Component::PLAYER);
 		for(auto& e : elist) {
-
 			if((e->mask & input_mask) == input_mask) {
 				auto& inp = e->inp;
 				auto& pos = e->pos;

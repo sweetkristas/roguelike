@@ -103,6 +103,15 @@ void engine::process_events()
 				break;
 		}
 		if(!claimed) {
+			for(auto& e : entity_list_) {
+				static component_id gui_mask = component::genmask(component::Component::GUI);
+				if((e->mask & gui_mask) == gui_mask) {
+					auto& g = e->gui;
+					for(auto& w : g->widgets) {
+						claimed = w->process_events(&evt, claimed);
+					}
+				}
+			}
 			for(auto& s : process_list_) {
 				if(s->process_event(evt)) {
 					break;

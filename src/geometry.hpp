@@ -119,6 +119,8 @@ namespace geometry
 		T mid_x() const { return (x1() + x2())/static_cast<T>(2); }
 		T mid_y() const { return (y1() + y2())/static_cast<T>(2); }
 
+		Point<T> mid() const { return point((x1() + x2())/static_cast<T>(2), (y1() + y2())/static_cast<T>(2)); }
+
 		bool empty() const { return w() == 0 || h() == 0; }
 
 		T perimeter(T line_thickness=T()) const { return w()*2+h()*2-line_thickness*2; }
@@ -152,6 +154,9 @@ namespace geometry
 
 	template<typename T> inline
 	bool operator<(const Rect<T>& a, const Rect<T>& b);
+
+	template<typename T, typename D> inline
+	Rect<T> operator*(const Rect<T>& lhs, D scalar);
 
 	/*template<> inline 
 	Rect<int>::Rect(const variant& v)

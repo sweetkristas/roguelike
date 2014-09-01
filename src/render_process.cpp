@@ -28,8 +28,12 @@ namespace process
 			if((e->mask & gui_mask) == gui_mask) {
 				auto& spr = e->spr;
 				auto& pos = e->pos;
+				auto& g = e->gui;
 				if(spr->tex.is_valid()) {
 					spr->tex.blit(rect(pos->pos.x, pos->pos.y));
+				}
+				for(auto& w : g->widgets) {
+					w->draw();
 				}
 			}  else if((e->mask & sprite_mask) == sprite_mask) {
 				auto& spr = e->spr;

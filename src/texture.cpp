@@ -130,12 +130,24 @@ namespace graphics
 		texture_from_surface(const_cast<SDL_Surface*>(surf->get()), this);
 	}
 
-	void texture::blit(const rect& dest)
+	void texture::blit(const rect& dest) const
 	{
 		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		SDL_Rect src = {area_.x(), area_.y(), area_.w(), area_.h()};
 		SDL_Rect dst = {dest.x(), dest.y(), dest.w() == 0 ? area_.w() : dest.w(), dest.h() == 0 ? area_.h() : dest.h()};
 		int res = SDL_RenderCopy(get_renderer(), tex_.get(), &src, &dst);
+		ASSERT_LOG(res == 0, "Failed to blit texture: " << SDL_GetError());
+	}
+
+	void texture::blit_ex(const rect& dest, double angle, const point& center, FlipFlags flip) const
+	{
+		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
+		SDL_Rect src = {area_.x(), area_.y(), area_.w(), area_.h()};
+		SDL_Rect dst = {dest.x(), dest.y(), dest.w() == 0 ? area_.w() : dest.w(), dest.h() == 0 ? area_.h() : dest.h()};
+		SDL_Point pt = {center.x, center.y};
+		SDL_RendererFlip ff = static_cast<SDL_RendererFlip>((flip & FlipFlags::HORIZONTAL ? SDL_FLIP_HORIZONTAL : 0) 
+			| (flip & FlipFlags::VERTICAL ? SDL_FLIP_VERTICAL : 0));
+		int res = SDL_RenderCopyEx(get_renderer(), tex_.get(), &src, &dst, angle, &pt, ff);
 		ASSERT_LOG(res == 0, "Failed to blit texture: " << SDL_GetError());
 	}
 

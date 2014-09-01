@@ -13,6 +13,7 @@
 #include "node.hpp"
 #include "terrain_generator.hpp"
 #include "texture.hpp"
+#include "widget.hpp"
 
 typedef std::bitset<64> component_id;
 
@@ -28,10 +29,10 @@ namespace component
 		INPUT,
 		LIGHTS,
 		MAP,
+		GUI,
 		// tag only values must go at end.
 		PLAYER,
 		ENEMY,
-		GUI,
 		COLLISION,
 		MAX_COMPONENTS,
 	};
@@ -133,6 +134,12 @@ namespace component
 		terrain::terrain t;
 	};
 
+	struct gui_component : public component
+	{
+		gui_component() : component(Component::GUI) {}
+		std::vector<gui::widget_ptr> widgets;
+	};
+
 	struct component_set
 	{
 		component_set(int z=0) : mask(component_id(0)), zorder(z) {}
@@ -144,6 +151,7 @@ namespace component
 		std::shared_ptr<ai> aip;
 		std::shared_ptr<input> inp;
 		std::shared_ptr<mapgrid> map;
+		std::shared_ptr<gui_component> gui;
 		bool is_player() { return (mask & genmask(Component::PLAYER)) == genmask(Component::PLAYER); }
 	};
 	typedef std::shared_ptr<component_set> component_set_ptr;

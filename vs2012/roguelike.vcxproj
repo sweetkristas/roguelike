@@ -24,6 +24,7 @@
     <ClCompile Include="..\src\filesystem.cpp" />
     <ClCompile Include="..\src\font.cpp" />
     <ClCompile Include="..\src\generate_cave.cpp" />
+    <ClCompile Include="..\src\gui_elements.cpp" />
     <ClCompile Include="..\src\gui_process.cpp" />
     <ClCompile Include="..\src\input_process.cpp" />
     <ClCompile Include="..\src\json.cpp" />
@@ -41,6 +42,7 @@
     <ClCompile Include="..\src\process.cpp" />
     <ClCompile Include="..\src\surface.cpp" />
     <ClCompile Include="..\src\terrain_generator.cpp" />
+    <ClCompile Include="..\src\texpack.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
     <ClCompile Include="..\src\tile.cpp" />
     <ClCompile Include="..\src\unit_test.cpp" />
@@ -65,6 +67,7 @@
     <ClInclude Include="..\src\generate_cave.hpp" />
     <ClInclude Include="..\src\geometry.hpp" />
     <ClInclude Include="..\src\graphics.hpp" />
+    <ClInclude Include="..\src\gui_elements.hpp" />
     <ClInclude Include="..\src\gui_process.hpp" />
     <ClInclude Include="..\src\hasher.hpp" />
     <ClInclude Include="..\src\input_process.hpp" />
@@ -86,6 +89,7 @@
     <ClInclude Include="..\src\process.hpp" />
     <ClInclude Include="..\src\surface.hpp" />
     <ClInclude Include="..\src\terrain_generator.hpp" />
+    <ClInclude Include="..\src\texpack.hpp" />
     <ClInclude Include="..\src\texture.hpp" />
     <ClInclude Include="..\src\tile.hpp" />
     <ClInclude Include="..\src\unit_test.hpp" />

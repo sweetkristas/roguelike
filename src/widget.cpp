@@ -3,7 +3,9 @@
 namespace gui
 {
 	widget::widget()
-		: zorder_(0)
+		: zorder_(0), 
+		  rotation_(0), 
+		  scale_(1.0f)
 	{
 	}
 
@@ -13,7 +15,7 @@ namespace gui
 
 	bool widget::in_widget(const point& p)
 	{
-		return geometry::pointInRect(p, area_);
+		return geometry::pointInRect(p, area_ * get_scale());
 	}
 
 	void widget::draw(const point& p, float rotation, float scale) const
@@ -33,4 +35,5 @@ namespace gui
 	{
 		handle_update(t);
 	}
+
 }

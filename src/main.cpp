@@ -13,6 +13,7 @@
 #include "action_process.hpp"
 #include "ai_process.hpp"
 #include "asserts.hpp"
+#include "button.hpp"
 #include "collision_process.hpp"
 #include "component.hpp"
 #include "creature.hpp"
@@ -83,15 +84,18 @@ void create_player(engine& e, const point& start)
 	e.add_entity(player);
 
 	// Create GUI (needs player stats to we stick it in here for now)
-	component_set_ptr gui = std::make_shared<component::component_set>(900);
-	gui->mask |= component::genmask(component::Component::POSITION);
-	gui->mask |= component::genmask(component::Component::SPRITE);
-	gui->mask |= component::genmask(component::Component::STATS);
-	gui->mask |= component::genmask(component::Component::GUI);
-	gui->pos = std::make_shared<component::position>();
-	gui->spr = std::make_shared<component::sprite>();
-	gui->stat = player->stat;
-	e.add_entity(gui);
+	component_set_ptr guic = std::make_shared<component::component_set>(900);
+	guic->mask |= component::genmask(component::Component::POSITION);
+	guic->mask |= component::genmask(component::Component::SPRITE);
+	guic->mask |= component::genmask(component::Component::STATS);
+	guic->mask |= component::genmask(component::Component::GUI);
+	guic->pos = std::make_shared<component::position>();
+	guic->spr = std::make_shared<component::sprite>();
+	guic->gui = std::make_shared<component::gui_component>();
+	auto w = std::make_shared<gui::button>(rect(100,100), [](){std::cerr<<"pressed\n";});
+	guic->gui->widgets.push_back(w);
+	guic->stat = player->stat;
+	e.add_entity(guic);
 }
 
 component_set_ptr create_world(engine& e)
