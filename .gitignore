@@ -40,3 +40,7 @@ vs2013/Debug
 vs2013/Release
 vs2012/Debug
 vs2012/Release
+
+# exclude any temporary files.
+images/temp
+data/temp
