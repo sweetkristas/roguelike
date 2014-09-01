@@ -24,6 +24,7 @@
     <ClCompile Include="..\src\filesystem.cpp" />
     <ClCompile Include="..\src\font.cpp" />
     <ClCompile Include="..\src\generate_cave.cpp" />
+    <ClCompile Include="..\src\gui_elements.cpp" />
     <ClCompile Include="..\src\gui_process.cpp" />
     <ClCompile Include="..\src\input_process.cpp" />
     <ClCompile Include="..\src\json.cpp" />
@@ -41,6 +42,7 @@
     <ClCompile Include="..\src\render_process.cpp" />
     <ClCompile Include="..\src\surface.cpp" />
     <ClCompile Include="..\src\terrain_generator.cpp" />
+    <ClCompile Include="..\src\texpack.cpp" />
     <ClCompile Include="..\src\texture.cpp" />
     <ClCompile Include="..\src\tile.cpp" />
     <ClCompile Include="..\src\unit_test.cpp" />
@@ -48,6 +50,8 @@
     <ClCompile Include="..\src\wm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\treetree\iterator_shorthands.hpp" />
+    <ClInclude Include="..\include\treetree\tree.hpp" />
     <ClInclude Include="..\src\action_process.hpp" />
     <ClInclude Include="..\src\ai_process.hpp" />
     <ClInclude Include="..\src\basic_dir_monitor.hpp" />
@@ -68,6 +72,7 @@
     <ClInclude Include="..\src\geometry.hpp" />
     <ClInclude Include="..\src\GLee.h" />
     <ClInclude Include="..\src\graphics.hpp" />
+    <ClInclude Include="..\src\gui_elements.hpp" />
     <ClInclude Include="..\src\gui_process.hpp" />
     <ClInclude Include="..\src\input_process.hpp" />
     <ClInclude Include="..\src\json.hpp" />
@@ -88,6 +93,7 @@
     <ClInclude Include="..\src\sdl_wrapper.hpp" />
     <ClInclude Include="..\src\surface.hpp" />
     <ClInclude Include="..\src\terrain_generator.hpp" />
+    <ClInclude Include="..\src\texpack.hpp" />
     <ClInclude Include="..\src\texture.hpp" />
     <ClInclude Include="..\src\tile.hpp" />
     <ClInclude Include="..\src\unit_test.hpp" />

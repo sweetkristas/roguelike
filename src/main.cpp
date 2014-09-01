@@ -19,6 +19,7 @@
 #include "engine.hpp"
 #include "font.hpp"
 #include "generate_cave.hpp"
+#include "gui_elements.hpp"
 #include "gui_process.hpp"
 #include "json.hpp"
 #include "input_process.hpp"
@@ -165,6 +166,8 @@ int main(int argc, char* argv[])
 		terrain::terrain::load_terrain_data(json::parse_from_file("data/terrain.cfg"));
 
 		creature::loader(json::parse_from_file("data/creatures.cfg"));
+
+		gui::section::manager gui_manager(wm.get_renderer(), json::parse_from_file("data/gui.cfg"));
 
 		// XX engine should take the renderer as a parameter, expose it as a get function, then pass itself
 		// to the update function.

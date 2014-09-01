@@ -59,4 +59,10 @@ namespace graphics
 		SDL_Rect dr = {dst_rect.x(), dst_rect.y(), dst_rect.w(), dst_rect.h()};
 		SDL_BlitSurface(src->surf_.get(), &sr, surf_.get(), &dr);
 	}
+
+	void surface::save(const std::string& filename)
+	{
+		int res = IMG_SavePNG(surf_.get(), filename.c_str());
+		ASSERT_LOG(res == 0, "Error save image file: " << IMG_GetError());
+	}
 }

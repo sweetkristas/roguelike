@@ -121,6 +121,8 @@ namespace geometry
 
 		bool empty() const { return w() == 0 || h() == 0; }
 
+		T perimeter(T line_thickness=T()) const { return w()*2+h()*2-line_thickness*2; }
+
 		const Point<T>& top_left() const { return top_left_; }
 		const Point<T>& bottom_right() const { return bottom_right_; }
 

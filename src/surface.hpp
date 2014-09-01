@@ -48,6 +48,8 @@ namespace graphics
 		// scaled blit
 		void blit_scaled(const surface_ptr& src, const rect& dst_rect);
 		void blit_scaled(const surface_ptr& src, const rect& src_rect, const rect& dst_rect);
+
+		void save(const std::string& filename);
 	private:
 		surface();
 		std::shared_ptr<SDL_Surface> surf_;
