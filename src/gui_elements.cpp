@@ -27,14 +27,13 @@ namespace gui
 
 			ASSERT_LOG(n.has_key("sections") && n["sections"].is_list(), 
 				"Must be 'sections' attribute in gui file which is a list.");
-			std::vector<surface_ptr> surfs;
+			std::vector<std::pair<std::string, surface_ptr>> surfs;
 			for(auto& s : n["sections"].as_list()) {
-				surfs.emplace_back(std::make_shared<graphics::surface>(s["image"].as_string()));
+				surfs.emplace_back(std::make_pair(s["name"].as_string(), std::make_shared<graphics::surface>(s["image"].as_string())));
 			}
-			graphics::packer packed_surfs(surfs, std::min(1024,std::min(info.max_texture_width, info.max_texture_height)));
-			for(auto& p : packed_surfs) {
-				for(auto& r : p.rect_list) {
-					std::cerr << r.first << " : " << r.second << "\n";
+			for(auto& vtex : graphics::packer(surfs, info.max_texture_width, info.max_texture_height)) {
+				for(auto& tex : vtex) {
+					get_section_map()[tex.get_name()] = tex;
 				}
 			}
 		}
@@ -45,7 +44,9 @@ namespace gui
 
 		graphics::texture get(const std::string& name)
 		{
-			return graphics::texture();
+			auto it = get_section_map().find(name);
+			ASSERT_LOG(it != get_section_map().end(), "Unable to find a gui texture with name: " << name);
+			return it->second;
 		}
 	}
 }

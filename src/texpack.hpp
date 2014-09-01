@@ -4,30 +4,20 @@
 
 namespace graphics
 {
-	// inp is a list of input surfaces
-	struct texture_pack
-	{
-		texture_pack(graphics::texture t, std::vector<std::pair<surface_ptr,rect>>* rl)
-			: tex(t) {
-			if(rl) {
-				rect_list.swap(*rl);
-			}
-		}
-		graphics::texture tex;
-		std::vector<std::pair<surface_ptr,rect>> rect_list;
-	};
+	typedef std::pair<std::string, surface_ptr> surface_pair;
+	typedef std::vector<surface_pair> surface_pair_list;
 
 	class packer
 	{
 	public:
-		typedef std::vector<texture_pack>::iterator iterator;
-		typedef std::vector<texture_pack>::const_iterator const_iterator;
-		packer(const std::vector<surface_ptr> inp, int max_length);
+		typedef std::vector<std::vector<graphics::texture>>::iterator iterator;
+		typedef std::vector<std::vector<graphics::texture>>::const_iterator const_iterator;
+		packer(const surface_pair_list& inp, int max_width, int max_height);
 		iterator begin() { return outp.begin(); }
 		iterator end() { return outp.end(); }
 		const_iterator begin() const { return outp.begin(); }
 		const_iterator end() const { return outp.end(); }
 	private:
-		std::vector<texture_pack> outp;
+		std::vector<std::vector<graphics::texture>> outp;
 	};
 }

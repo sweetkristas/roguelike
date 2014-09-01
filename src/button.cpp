@@ -1,4 +1,5 @@
 #include "button.hpp"
+#include "gui_elements.hpp"
 
 namespace gui
 {
@@ -8,6 +9,9 @@ namespace gui
 		  is_pressed_(false)
 	{
 		set_area(pos);
+		normal_tex_ = gui::section::get("buttonLong_brown");
+		pressed_tex_ = gui::section::get("buttonLong_brown_pressed");
+		mouse_over_tex_ = gui::section::get("");
 	}
 
 	void button::handle_draw(const point& p, float rotation, float scale) const

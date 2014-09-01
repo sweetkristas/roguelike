@@ -46,6 +46,9 @@ namespace graphics
 
 		bool is_valid() { return tex_ != nullptr; }
 
+		void set_name(const std::string& name) { name_ = name; }
+		const std::string& get_name() const { return name_; }
+
 		void blit(const rect& dst);
 		//void blit_ex(SDL_Renderer* renderer, const rect& dst, double angle, const point& center, FlipFlags flip);
 		static void rebuild_cache();
@@ -55,5 +58,6 @@ namespace graphics
 		rect area_;
 		TextureFlags flags_;
 		std::shared_ptr<SDL_Texture> tex_;
+		std::string name_;
 	};
 }
