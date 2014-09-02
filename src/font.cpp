@@ -98,6 +98,12 @@ namespace font
 		ASSERT_LOG(res == 0, "Unable to get text size of string: '" << utf8 << "' : " << SDL_GetError());
 	}
 
+	std::string get_default_font_name()
+	{
+		// XXX load this from a config file.
+		return "SourceCodePro-Regular.ttf";
+	}
+
 	manager::manager()
 	{
 		ASSERT_LOG(TTF_Init() != -1, "TTF_Init error(): " << TTF_GetError());

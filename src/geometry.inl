@@ -102,6 +102,23 @@ namespace geometry
 		return Point<T>(lhs.x+rhs.x,lhs.y+rhs.y);
 	}
 
+	// Assumes that D is a scaling factor for T
+	template<typename T, typename D> inline
+	Point<T> operator*(const Point<T>& lhs, const Point<D>& rhs)
+	{
+		return Point<T>(static_cast<T>(lhs.x * rhs.x), static_cast<T>(lhs.y * rhs.y));
+	}
+	template<typename T> inline
+	Point<T> operator*(const Point<T>& lhs, float scalar)
+	{
+		return Point<T>(static_cast<T>(lhs.x * scalar), static_cast<T>(lhs.y * scalar));
+	}
+	template<typename T> inline
+	Point<T> operator*(const Point<T>& lhs, double scalar)
+	{
+		return Point<T>(static_cast<T>(lhs.x * scalar), static_cast<T>(lhs.y * scalar));
+	}
+
 	template<typename T> inline
 	Rect<T> Rect<T>::FromCoordinates(T x1, T y1, T x2, T y2)
 	{
@@ -135,11 +152,25 @@ namespace geometry
 	}
 
 	template<typename T, typename D> inline
-	Rect<T> operator*(const Rect<T>& lhs, D scalar)
+	Rect<T> operator*(const Rect<T>& lhs, const Rect<D>& rhs)
 	{
-		return rect(lhs.x(), lhs.y(), static_cast<T>(lhs.w()*scalar), static_cast<T>(lhs.h()*scalar));
+		return Rect<T>::FromCoordinates(static_cast<T>(lhs.x()*rhs.x()), 
+			static_cast<T>(lhs.y()*rhs.y()), 
+			static_cast<T>(lhs.x2()*rhs.x2()), 
+			static_cast<T>(lhs.y2()*rhs.y2()));
 	}
 
+	template<typename T> inline
+	Rect<T> operator*(const Rect<T>& lhs, float scalar)
+	{
+		return Rect<T>(lhs.x(), lhs.y(), static_cast<T>(lhs.w()*scalar), static_cast<T>(lhs.h()*scalar));
+	}
+
+	template<typename T> inline
+	Rect<T> operator*(const Rect<T>& lhs, double scalar)
+	{
+		return Rect<T>(lhs.x(), lhs.y(), static_cast<T>(lhs.w()*scalar), static_cast<T>(lhs.h()*scalar));
+	}
 
 	/*template<typename T> inline
 	Rect<T>::Rect(const variant& v)

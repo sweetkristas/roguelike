@@ -33,7 +33,7 @@ namespace process
 					spr->tex.blit(rect(pos->pos.x, pos->pos.y));
 				}
 				for(auto& w : g->widgets) {
-					w->draw();
+					w->draw(rect(0, 0, eng.get_window().width(), eng.get_window().height()), 0.0f, 1.0f);
 				}
 			}  else if((e->mask & sprite_mask) == sprite_mask) {
 				auto& spr = e->spr;

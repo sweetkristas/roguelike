@@ -55,6 +55,7 @@ public:
 	void set_tile_size(const point& p) { tile_size_ = p; }
 
 private:
+	void translate_mouse_coords(SDL_Event* evt);
 	void process_events();
 	void populate_quadtree();
 	EngineState state_;

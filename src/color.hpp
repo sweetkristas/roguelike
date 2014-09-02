@@ -7,7 +7,15 @@ namespace graphics
 	class color
 	{
 	public:
-		color(int r, int g, int b, int a = 255)
+		color()
+		{
+			c_.rgba[0] = 255;
+			c_.rgba[1] = 255;
+			c_.rgba[2] = 255;
+			c_.rgba[3] = 255;
+			set_float_values();
+		}
+		explicit color(int r, int g, int b, int a=255)
 		{
 			c_.rgba[0] = truncate_to_char(r);
 			c_.rgba[1] = truncate_to_char(g);
@@ -15,7 +23,7 @@ namespace graphics
 			c_.rgba[3] = truncate_to_char(a);
 			set_float_values();
 		}
-		explicit color(uint32_t rgba = 0)
+		explicit color(uint32_t rgba)
 		{
 			c_.value = rgba;
 			set_float_values();

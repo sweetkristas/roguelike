@@ -39,6 +39,14 @@ namespace graphics
 		return ((static_cast<int>(lhs) & static_cast<int>(rhs)) == static_cast<int>(rhs));
 	}
 
+	enum class BlendMode
+	{
+		NONE,			// no blending
+		BLEND,			// alpha blending
+		ADDITIVE,		// additive blending
+		MODULATE,		// color modulation
+	};
+
 	class texture
 	{
 	public:
@@ -59,9 +67,11 @@ namespace graphics
 		void update(const std::string& fname, const rect& area = rect());
 		void update(const surface_ptr& surf, const rect& area = rect());
 
+		void set_blend(BlendMode bm);
+
 		SDL_Texture* get() { return tex_.get(); }
 
-		bool is_valid() { return tex_ != nullptr; }
+		bool is_valid() const { return tex_ != nullptr; }
 
 		void set_name(const std::string& name) { name_ = name; }
 		const std::string& get_name() const { return name_; }
@@ -79,5 +89,6 @@ namespace graphics
 		TextureFlags flags_;
 		std::shared_ptr<SDL_Texture> tex_;
 		std::string name_;
+		SDL_BlendMode blend_mode_;
 	};
 }

@@ -6,6 +6,16 @@
 #include "node_utils.hpp"
 #include "profile_timer.hpp"
 
+namespace 
+{
+	const double mouse_event_scale_factor = 65535.0;
+}
+
+double get_mouse_scale_factor()
+{
+	return mouse_event_scale_factor;
+}
+
 engine::engine(graphics::window_manager& wm)
 	: state_(EngineState::PLAY),
 	  turns_(1),
@@ -48,12 +58,29 @@ void engine::remove_process(process::process_ptr s)
 		[&s](process::process_ptr sp) { return sp == s; }), process_list_.end());
 }
 
+void engine::translate_mouse_coords(SDL_Event* evt)
+{
+	// transform the absolute mouse co-ordinates to a window-size independent quantity.
+	if(evt->type == SDL_MOUSEMOTION) {
+		evt->motion.x = static_cast<Sint32>((evt->motion.x * mouse_event_scale_factor) / wm_.width());
+		evt->motion.y = static_cast<Sint32>((evt->motion.y * mouse_event_scale_factor) / wm_.height());
+	} else {
+		evt->button.x = static_cast<Sint32>((evt->button.x * mouse_event_scale_factor) / wm_.width());
+		evt->button.y = static_cast<Sint32>((evt->button.y * mouse_event_scale_factor) / wm_.height());
+	}
+}
+
 void engine::process_events()
 {
 	SDL_Event evt;
 	while(SDL_PollEvent(&evt)) {
 		bool claimed = false;
 		switch(evt.type) {
+			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
+			case SDL_MOUSEMOTION:
+				translate_mouse_coords(&evt);
+				break;
 			case SDL_MOUSEWHEEL:
 				break;
 			case SDL_QUIT:

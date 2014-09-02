@@ -64,7 +64,8 @@ namespace graphics
 
 	texture::texture(const std::string& fname, TextureFlags flags, const rect& area)
 		: area_(area), 
-		  flags_(flags)
+		  flags_(flags),
+		  blend_mode_(SDL_BLENDMODE_BLEND)
 	{
 		if(flags & TextureFlags::NO_CACHE) {
 			load_file_into_texture(fname, this);
@@ -81,7 +82,8 @@ namespace graphics
 
 	texture::texture(int w, int h, TextureFlags flags)
 		: flags_(flags),
-		  area_(rect(0, 0, w, h))
+		  area_(rect(0, 0, w, h)),
+		  blend_mode_(SDL_BLENDMODE_BLEND)
 	{
 		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		auto ntex = SDL_CreateTexture(get_renderer(), 
@@ -97,7 +99,8 @@ namespace graphics
 
 	texture::texture(const surface_ptr& surf, TextureFlags flags, const rect& area)
 		: area_(area), 
-		  flags_(flags)
+		  flags_(flags),
+		  blend_mode_(SDL_BLENDMODE_BLEND)
 	{
 		texture_from_surface(const_cast<SDL_Surface*>(surf->get()), this);
 	}
@@ -135,7 +138,9 @@ namespace graphics
 		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
 		SDL_Rect src = {area_.x(), area_.y(), area_.w(), area_.h()};
 		SDL_Rect dst = {dest.x(), dest.y(), dest.w() == 0 ? area_.w() : dest.w(), dest.h() == 0 ? area_.h() : dest.h()};
-		int res = SDL_RenderCopy(get_renderer(), tex_.get(), &src, &dst);
+		int res = SDL_SetTextureBlendMode(tex_.get(), blend_mode_);
+		ASSERT_LOG(res == 0, "Blend mode couldn't be set: " << SDL_GetError());
+		res = SDL_RenderCopy(get_renderer(), tex_.get(), &src, &dst);
 		ASSERT_LOG(res == 0, "Failed to blit texture: " << SDL_GetError());
 	}
 
@@ -147,8 +152,23 @@ namespace graphics
 		SDL_Point pt = {center.x, center.y};
 		SDL_RendererFlip ff = static_cast<SDL_RendererFlip>((flip & FlipFlags::HORIZONTAL ? SDL_FLIP_HORIZONTAL : 0) 
 			| (flip & FlipFlags::VERTICAL ? SDL_FLIP_VERTICAL : 0));
-		int res = SDL_RenderCopyEx(get_renderer(), tex_.get(), &src, &dst, angle, &pt, ff);
+		int res = SDL_SetTextureBlendMode(tex_.get(), blend_mode_);
+		ASSERT_LOG(res == 0, "Blend mode couldn't be set: " << SDL_GetError());
+		res = SDL_RenderCopyEx(get_renderer(), tex_.get(), &src, &dst, angle, &pt, ff);
 		ASSERT_LOG(res == 0, "Failed to blit texture: " << SDL_GetError());
+	}
+
+	void texture::set_blend(BlendMode bm)
+	{
+		SDL_BlendMode sbm = SDL_BLENDMODE_NONE;
+		switch(bm) {
+			case BlendMode::NONE:		sbm = SDL_BLENDMODE_NONE; break;
+			case BlendMode::BLEND:		sbm = SDL_BLENDMODE_BLEND; break;
+			case BlendMode::ADDITIVE:	sbm = SDL_BLENDMODE_ADD; break;
+			case BlendMode::MODULATE:	sbm = SDL_BLENDMODE_MOD; break;
+			default: ASSERT_LOG(false, "Unrecognised constant for blend mode: " << static_cast<int>(bm));
+		}
+		blend_mode_ = sbm;
 	}
 
 	void texture::set_area(const rect& area)

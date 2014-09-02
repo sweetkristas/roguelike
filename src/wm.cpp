@@ -9,9 +9,9 @@ namespace graphics
 {
 	namespace 
 	{
-		std::vector<window_manager>& get_windows()
+		std::vector<window_manager*>& get_windows()
 		{
-			static std::vector<window_manager> res;
+			static std::vector<window_manager*> res;
 			return res;
 		}
 	}
@@ -22,6 +22,12 @@ namespace graphics
 		width_(1024),
 		height_(768)
 	{
+	}
+
+	window_manager& window_manager::get_main_window()
+	{
+		ASSERT_LOG(!get_windows().empty(), "No windows in list, or has not been set.");
+		return *get_windows().front();
 	}
 		
 	void window_manager::create_window(const std::string& title, int x, int y, int w, int h, Uint32 flags)
@@ -38,6 +44,7 @@ namespace graphics
 		}
 		width_ = w;
 		height_ = h;
+		area_ = rect(0, 0, w, h);
 
 		// Search for opengl renderer
 		int num_rend = SDL_GetNumRenderDrivers();
@@ -74,6 +81,7 @@ namespace graphics
 		}
 
 		SDL_SetHintWithPriority(SDL_HINT_RENDER_VSYNC, "0", SDL_HINT_OVERRIDE);
+		get_windows().emplace_back(this);
 	}
 
 	void window_manager::set_icon(const std::string& icon)
@@ -120,6 +128,7 @@ namespace graphics
 	void window_manager::update_window_size()
 	{
 		SDL_GetWindowSize(window_, &width_, &height_);
+		area_ = rect(0, 0, width_, height_);
 	}
 
 	window_manager::~window_manager()

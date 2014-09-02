@@ -27,6 +27,7 @@ namespace font
 	};
 
 	typedef std::shared_ptr<TTF_Font> font_ptr;
+	std::string get_default_font_name();
 	font_ptr get_font(const std::string& font_name, int size);
 	void get_glyph_metrics(const font_ptr& fnt, int ch, int *w, int *h, glyph_metrics* gm=NULL);
 	void get_text_size(const font_ptr& fnt, const std::string& utf8, int* w, int* h);

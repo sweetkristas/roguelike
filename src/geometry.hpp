@@ -58,6 +58,12 @@ namespace geometry
 	bool operator<(const Point<T>& a, const Point<T>& b);
 	template<typename T> inline
 	Point<T> operator+(const Point<T>& lhs, const Point<T>& rhs);
+	template<typename T, typename D> inline
+	Point<T> operator*(const Point<T>& lhs, const Point<D>& rhs);
+	template<typename T> inline
+	Point<T> operator*(const Point<T>& lhs, float scalar);
+	template<typename T> inline
+	Point<T> operator*(const Point<T>& lhs, double scalar);
 
 	//template<> inline Point<int>::Point(const variant& v)
 	//{
@@ -115,6 +121,7 @@ namespace geometry
 		T y2() const { return bottom_right_.y; }
 		T w() const { return bottom_right_.x - top_left_.x; }
 		T h() const { return bottom_right_.y - top_left_.y; }
+		Point<T> dimensions() const { return Point<T>(w(), h()); }
 
 		T mid_x() const { return (x1() + x2())/static_cast<T>(2); }
 		T mid_y() const { return (y1() + y2())/static_cast<T>(2); }

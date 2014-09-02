@@ -5,22 +5,42 @@
 
 #include "SDL.h"
 
+#include "engine_fwd.hpp"
 #include "geometry.hpp"
 #include "texture.hpp"
 
+extern double get_mouse_scale_factor();
+
 namespace gui
 {
+	enum class Justify {
+		LEFT		= 1, 
+		H_CENTER	= 2,
+		RIGHT		= 4,
+		TOP			= 8,
+		V_CENTER	= 16,
+		BOTTOM		= 32,
+	};
+
+	inline Justify operator|(Justify lhs, Justify rhs) {
+		return static_cast<Justify>(static_cast<int>(lhs) | static_cast<int>(rhs));
+	}
+	inline bool operator&(Justify lhs, Justify rhs) {
+		return (static_cast<int>(lhs) & static_cast<int>(rhs)) == static_cast<int>(rhs);
+	}
+
 	class widget
 	{
 	public:
-		widget();
+		explicit widget(const rectf& r, Justify justify);
 		virtual ~widget();
-		void draw(const point& p=point(), float rotation=0.0, float scale=0.0) const;
+		void draw(const rect& r, float rotation, float scale) const;
 		bool process_events(SDL_Event* evt, bool claimed);
-		void update(double t);
+		void update(engine& eng, double t);
 
-		void set_area(const rect& area) { area_ = area; }
-		const rect& get_area() const { return area_; }
+		void set_area(const rectf& area) { area_ = area; area_set_ = true; update_area(); }
+		const rectf& get_area() const { return real_area_; }
+		bool is_area_set() { return area_set_; }
 
 		int get_zorder() const { return zorder_; }
 		void set_zorder(int z) { zorder_ = z; }
@@ -31,15 +51,33 @@ namespace gui
 		float get_scale() const { return scale_; }
 		void set_scale(float scale) { scale_ = scale; }
 
+		void set_justification(Justify j);
+
+		void set_parent(widget* parent);
+
+	protected:
 		bool in_widget(const point& p);
+		void set_dim_internal(int w, int h);
+		void set_loc_internal(const pointf& loc);
+		float get_parent_absolute_width();
+		float get_parent_absolute_height();
 	private:
-		virtual void handle_update(double t) {}
-		virtual void handle_draw(const point& p, float rotation, float scale) const {}
+		virtual void handle_update(engine& eng, double t) {}
+		virtual void handle_draw(const rect& r, float rotation, float scale) const {}
 		virtual bool handle_events(SDL_Event* evt, bool claimed) { return claimed; }
-		rect area_;
+		void update_area();
+		virtual void recalc_dimensions() = 0;
+		// The elements of area should be defined on the interval (0,1)
+		// representing the fraction of the parent.
+		rectf area_;
+		// Area after justification is applied.
+		rectf real_area_;
 		int zorder_;
 		float rotation_;
 		float scale_;
+		bool area_set_;
+		Justify just_;
+		widget* parent_;
 	};
 
 	typedef std::shared_ptr<widget> widget_ptr;

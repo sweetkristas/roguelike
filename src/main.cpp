@@ -17,6 +17,7 @@
 #include "collision_process.hpp"
 #include "component.hpp"
 #include "creature.hpp"
+#include "dialog.hpp"
 #include "engine.hpp"
 #include "font.hpp"
 #include "generate_cave.hpp"
@@ -24,6 +25,7 @@
 #include "gui_process.hpp"
 #include "json.hpp"
 #include "input_process.hpp"
+#include "label.hpp"
 #include "node_utils.hpp"
 #include "profile_timer.hpp"
 #include "random.hpp"
@@ -67,7 +69,7 @@ void create_player(engine& e, const point& start)
 {
 	component_set_ptr player = std::make_shared<component::component_set>(100);
 	// Player component simply acts as a tag for the entity
-	font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
+	//font::font_ptr fnt = font::get_font("SourceCodePro-Regular.ttf", 20);
 	player->mask |= component::genmask(component::Component::PLAYER);
 	player->mask |= component::genmask(component::Component::POSITION);
 	player->mask |= component::genmask(component::Component::STATS);
@@ -79,8 +81,9 @@ void create_player(engine& e, const point& start)
 	player->stat = std::make_shared<component::stats>();
 	player->stat->health = 10;
 	player->inp = std::make_shared<component::input>();
-	auto surf = font::render_shaded("@", fnt, graphics::color(255,255,255), graphics::color(255,0,0));
-	player->spr = std::make_shared<component::sprite>(std::make_shared<graphics::surface>(surf));
+	//auto surf = std::make_shared<graphics::surface>(font::render_shaded("@", fnt, graphics::color(255,255,255), graphics::color(255,0,0)));
+	auto surf = std::make_shared<graphics::surface>("images/spritely_fellow.png");
+	player->spr = std::make_shared<component::sprite>(surf);
 	e.add_entity(player);
 
 	// Create GUI (needs player stats to we stick it in here for now)
@@ -92,8 +95,13 @@ void create_player(engine& e, const point& start)
 	guic->pos = std::make_shared<component::position>();
 	guic->spr = std::make_shared<component::sprite>();
 	guic->gui = std::make_shared<component::gui_component>();
-	auto w = std::make_shared<gui::button>(rect(100,100), [](){std::cerr<<"pressed\n";});
-	guic->gui->widgets.push_back(w);
+	auto l = std::make_shared<gui::label>(rectf(0.0f, 0.0f), gui::Justify::H_CENTER|gui::Justify::V_CENTER, "Press Me!");
+	l->set_size(24);
+	auto w = std::make_shared<gui::button>(rectf(0.0f, -0.1f), gui::Justify::H_CENTER|gui::Justify::BOTTOM, [](){std::cerr<<"pressed\n";}, l);
+
+	auto dlg = std::make_shared<gui::dialog>(rectf(0.25f, 0.15f, 0.5f, 0.7f), gui::Justify::LEFT|gui::Justify::TOP);
+	dlg->add_widget(w);
+	//guic->gui->widgets.push_back(dlg);
 	guic->stat = player->stat;
 	e.add_entity(guic);
 }
@@ -159,6 +167,8 @@ int main(int argc, char* argv[])
 		wm.set_icon("images/icon.png");
 		wm.gl_init();
 
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
 		bool running = true;
 
 		// XXX Try and load a save file here, including random seed. If no save file we generate a new seed
@@ -195,8 +205,8 @@ int main(int argc, char* argv[])
 
 		graphics::texture darkness(wm.width(), wm.height(), graphics::TextureFlags::NO_CACHE | graphics::TextureFlags::TARGET);
 		graphics::texture light("images/light.png", graphics::TextureFlags::NONE);
-		SDL_SetTextureBlendMode(light.get(), SDL_BLENDMODE_BLEND);
-		SDL_SetTextureBlendMode(darkness.get(), SDL_BLENDMODE_MOD);
+		darkness.set_blend(graphics::BlendMode::BLEND);
+		light.set_blend(graphics::BlendMode::MODULATE);
 		SDL_SetRenderTarget(wm.get_renderer(), darkness.get());
 		SDL_SetRenderDrawColor(wm.get_renderer(), 16, 16, 32, 224);
 		SDL_RenderClear(wm.get_renderer());
