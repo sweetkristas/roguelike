@@ -219,7 +219,8 @@ int main(int argc, char* argv[])
 
 		SDL_SetRenderTarget(wm.get_renderer(), NULL);
 
-		auto dung = dungeon::dungeon_model::generate();
+		//auto dung = dungeon::dungeon_model::generate();
+		auto dung = dungeon::dungeon_model::read(json::parse_from_file("data/map_test.cfg"));
 		dungeon::dungeon_view dv(dung);
 		////////////////////////////////////////////
 		SDL_SetRenderDrawColor(wm.get_renderer(), 0, 0, 0, 255);

@@ -25,6 +25,7 @@ namespace dungeon
 		static dungeon_model_ptr read(const node& n);
 		node write();
 	private:
+		int level_;
 		int width_;
 		int height_;
 		std::vector<std::vector<int>> tile_map_;

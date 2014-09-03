@@ -50,9 +50,10 @@ namespace dungeon
 		class dungeon_rule
 		{
 		public:
-			dungeon_rule() : default_index_(-1) {}
-			dungeon_rule(int def, std::vector<tile_rule>* rules) 
-				: default_index_(def)
+			dungeon_rule() : default_index_(-1), ascii_(0) {}
+			dungeon_rule(int def, std::vector<tile_rule>* rules, char ascii) 
+				: default_index_(def), 
+				  ascii_(ascii)
 			{
 				rules_.swap(*rules);
 			}
@@ -60,6 +61,7 @@ namespace dungeon
 			int get_default() const { return default_index_; }
 		private:
 			int default_index_;
+			char ascii_;
 			std::vector<tile_rule> rules_;
 		};
 
@@ -92,24 +94,38 @@ namespace dungeon
 			return res;
 		}
 
+		typedef std::map<char, int> ascii_map_type;
+		ascii_map_type& get_ascii_map()
+		{
+			static ascii_map_type res;
+			return res;
+		}
+
+		int get_tile_type_from_ascii(char c)
+		{
+			auto it = get_ascii_map().find(c);
+			ASSERT_LOG(it != get_ascii_map().end(), "Unable to find ascii symbol '" << c << "' in the list.");
+			return it->second;
+		}
+
 		// Checks that the direction is one we know
 		Direction get_direction_index(const std::string& dir)
 		{
-			if(dir == "nw" || dir == "northwest") {
+			if(dir == "NW" || dir == "nw" || dir == "northwest") {
 				return Direction::NW;
-			} else if(dir == "n" || dir == "north") {
+			} else if(dir == "N" || dir == "n" || dir == "north") {
 				return Direction::N;
-			} else if(dir == "ne" || dir == "northeast") {
+			} else if(dir == "NE" || dir == "ne" || dir == "northeast") {
 				return Direction::NE;
-			} else if(dir == "w" || dir == "west") {
+			} else if(dir == "W" || dir == "w" || dir == "west") {
 				return Direction::W;
-			} else if(dir == "e" || dir == "east") {
+			} else if(dir == "E" || dir == "e" || dir == "east") {
 				return Direction::E;
-			} else if(dir == "sw" || dir == "southwest") {
+			} else if(dir == "SW" || dir == "sw" || dir == "southwest") {
 				return Direction::SW;
-			} else if(dir == "S" || dir == "south") {
+			} else if(dir == "S" || dir == "s" || dir == "south") {
 				return Direction::S;
-			} else if(dir == "SE" || dir == "southeast") {
+			} else if(dir == "SE" || dir == "se" || dir == "southeast") {
 				return Direction::SE;
 			}
 			ASSERT_LOG(false, "Unrecognised direction: " << dir);
@@ -239,6 +255,10 @@ namespace dungeon
 			ASSERT_LOG(it != get_name_index_map().end(), "Something bad happened " << name << " wasn't found in our internal list.");
 			int name_index = it->second;
 			const int default_index = rule.second["default_index"].as_int32();
+			char ascii_char = rule.second["ascii"].as_string()[0];
+			auto am_it = get_ascii_map().find(ascii_char);
+			ASSERT_LOG(am_it == get_ascii_map().end(), "ASCII character for '" << name << "' already used.");
+			get_ascii_map()[ascii_char] = name_index;
 			std::vector<tile_rule> tile_rules;
 			for(auto& r : rule.second["rules"].as_list()) {
 				ASSERT_LOG(r.has_key("index") && r.has_key("map"), "rules must have 'index' and 'map' attributes.");
@@ -261,7 +281,7 @@ namespace dungeon
 					tile_rules.back().matches[static_cast<int>(dir)] = it->second * (negate ? match_anything_but : 1);
 				}
 			}
-			get_rule_map()[name_index] = dungeon_rule(default_index, &tile_rules);
+			get_rule_map()[name_index] = dungeon_rule(default_index, &tile_rules, ascii_char);
 		}
 	}
 
@@ -284,7 +304,7 @@ namespace dungeon
 				//int r = generator::get_uniform_int<int>(2, static_cast<int>(get_index_name_map().size()-1));
 				//auto it = get_index_name_map().begin();
 				//std::advance(it, r);
-				dung->tile_map_[y][x] =  get_name_index_map()["wall"];//it->first;
+				dung->tile_map_[y][x] = get_name_index_map()["wall"];//it->first;
 			}
 		}
 		return dung;
@@ -292,7 +312,29 @@ namespace dungeon
 
 	dungeon_model_ptr dungeon_model::read(const node& n)
 	{
-		return dungeon_model_ptr();
+		auto dung = std::make_shared<dungeon_model>();
+		ASSERT_LOG(n.has_key("level"), "Map must have a 'level' attribute.");
+		ASSERT_LOG(n.has_key("map"), "Map must have a 'map' attribute.");
+		dung->level_ = n["level"].as_int32();
+		dung->tile_map_.resize(n["map"].num_elements());
+		int y = 0;
+		int row_length = std::numeric_limits<int>::min();
+		for(auto& row : n["map"].as_list()) {
+			const std::string& row_str = row.as_string();
+			dung->tile_map_[y].resize(row_str.size());
+			int x = 0;
+			for(char c : row_str) {
+				dung->tile_map_[y][x] = get_tile_type_from_ascii(c);
+				++x;
+			}
+			if(static_cast<int>(row_str.size()) > row_length) {
+				row_length = row_str.size();
+			}
+			++y;
+		}
+		dung->width_ = row_length;
+		dung->height_ = dung->tile_map_.size();
+		return dung;
 	}
 
 	node dungeon_model::write()
