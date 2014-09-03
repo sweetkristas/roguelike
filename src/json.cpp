@@ -238,6 +238,11 @@ namespace json
 					} else if(*it_ == ':') {
 						++it_;
 						return boost::make_tuple(COLON, node());
+					} else if(*it_ == '/' && *(it_+1) == '/') {
+						// is single line comment
+						while(*it_ != '\n') {
+							++it_;
+						}
 					} else if(*it_ == '"') {
 						in_string = true;
 						++it_;
@@ -429,7 +434,8 @@ UNIT_TEST(json_parse_test)
 		"\"float\": 1e-0,\n"
 		"\"int\": 999999999999,\n"
 		"\"true\": true,\n"
-		"\"false\": false,\n"
+		"// comment 1\n"
+		"\"false\": false, // comment 2\n"
 		"\"null\": null,\n"
 		"\"list\": [1,2,3,4],\n"
 		"\"map\": {\"a\":\"a\", b: \"b\", c:\"c\"},\n"
