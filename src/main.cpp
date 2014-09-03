@@ -205,6 +205,9 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::em_collision>());
 		e.add_process(std::make_shared<process::ee_collision>());
 
+
+		////////////////////////////////////////////
+		// test code block
 		graphics::texture darkness(wm.width(), wm.height(), graphics::TextureFlags::NO_CACHE | graphics::TextureFlags::TARGET);
 		graphics::texture light("images/light.png", graphics::TextureFlags::NONE);
 		darkness.set_blend(graphics::BlendMode::BLEND);
@@ -215,13 +218,18 @@ int main(int argc, char* argv[])
 		light.blit(rect((wm.width()-e.get_tile_size().x*4)/2, (wm.height()-e.get_tile_size().y*4)/2, e.get_tile_size().x*4, e.get_tile_size().y*4));
 
 		SDL_SetRenderTarget(wm.get_renderer(), NULL);
-		SDL_SetRenderDrawColor(wm.get_renderer(), 255, 255, 255, 255);
+
+		auto dung = dungeon::dungeon_model::generate();
+		dungeon::dungeon_view dv(dung);
+		////////////////////////////////////////////
+		SDL_SetRenderDrawColor(wm.get_renderer(), 0, 0, 0, 255);
 		while(running) {
 			Uint32 cycle_start_tick = SDL_GetTicks();
 			profile::timer tm;
 
 			SDL_RenderClear(wm.get_renderer());
 			running = e.update(60.0/1000.0);
+			dv.draw(0,0);
 			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
 	

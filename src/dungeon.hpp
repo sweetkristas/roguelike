@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "node.hpp"
+#include "texture.hpp"
 
 namespace dungeon
 {

@@ -20,6 +20,7 @@
     <ClCompile Include="..\src\creature.cpp" />
     <ClCompile Include="..\src\datetime.cpp" />
     <ClCompile Include="..\src\dialog.cpp" />
+    <ClCompile Include="..\src\dungeon.cpp" />
     <ClCompile Include="..\src\engine.cpp" />
     <ClCompile Include="..\src\filesystem.cpp" />
     <ClCompile Include="..\src\font.cpp" />
@@ -61,6 +62,7 @@
     <ClInclude Include="..\src\datetime.hpp" />
     <ClInclude Include="..\src\dialog.hpp" />
     <ClInclude Include="..\src\dir_monitor.hpp" />
+    <ClInclude Include="..\src\dungeon.hpp" />
     <ClInclude Include="..\src\engine.hpp" />
     <ClInclude Include="..\src\filesystem.hpp" />
     <ClInclude Include="..\src\font.hpp" />

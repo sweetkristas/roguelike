@@ -3,6 +3,7 @@
 
 #include "asserts.hpp"
 #include "dungeon.hpp"
+#include "profile_timer.hpp"
 #include "random.hpp"
 #include "texture.hpp"
 #include "wm.hpp"
@@ -118,9 +119,9 @@ namespace dungeon
 		int match_tile(const std::vector<int>& surrounds)
 		{
 			int max_dir = static_cast<int>(Direction::MAX);
-			ASSERT_LOG(surrounds.size() != max_dir, "Surrounds is wrong size: " << surrounds.size() << " != " << max_dir);
-			auto it = tile_rule_map().find(surrounds[static_cast<int>(Direction::CENTER)]);
-			ASSERT_LOG(it != tile_rule_map().end(), 
+			ASSERT_LOG(surrounds.size() == max_dir, "Surrounds is wrong size: " << surrounds.size() << " != " << max_dir);
+			auto it = get_rule_map().find(surrounds[static_cast<int>(Direction::CENTER)]);
+			ASSERT_LOG(it != get_rule_map().end(), 
 				"Couldn't find a dungeon rule matching the value: " << static_cast<int>(Direction::CENTER));
 			const auto& dr = it->second;
 			auto& rules = dr.get_rules();
@@ -234,7 +235,7 @@ namespace dungeon
 		for(auto& rule : rule_map) {
 			// First element is the name of the tile. Second element is the details
 			const auto& name = rule.first.as_string();
-			auto it = get_name_index_map().find(name);
+				auto it = get_name_index_map().find(name);
 			ASSERT_LOG(it != get_name_index_map().end(), "Something bad happened " << name << " wasn't found in our internal list.");
 			int name_index = it->second;
 			const int default_index = rule.second["default_index"].as_int32();
@@ -280,10 +281,10 @@ namespace dungeon
 
 		for(int y = 0; y != dung->height_; ++y) {
 			for(int x = 0; x != dung->width_; ++x) {
-				int r = generator::get_uniform_int<int>(0, static_cast<int>(index_name_map().size()));
-				auto it = index_name_map().begin();
-				std::advance(it, r);
-				dung->tile_map_[y][x] =  it->first;
+				//int r = generator::get_uniform_int<int>(2, static_cast<int>(get_index_name_map().size()-1));
+				//auto it = get_index_name_map().begin();
+				//std::advance(it, r);
+				dung->tile_map_[y][x] =  get_name_index_map()["wall"];//it->first;
 			}
 		}
 		return dung;
@@ -291,10 +292,12 @@ namespace dungeon
 
 	dungeon_model_ptr dungeon_model::read(const node& n)
 	{
+		return dungeon_model_ptr();
 	}
 
 	node dungeon_model::write()
 	{
+		return node();
 	}
 
 	int dungeon_model::get_at(int x, int y)
@@ -310,6 +313,8 @@ namespace dungeon
 	dungeon_view::dungeon_view(dungeon_model_ptr model)
 		: model_(model)
 	{
+		profile::manager pman("dungeon_view constructor");
+
 		int level = 0;
 
 		image& img = get_surface_from_level(level);
@@ -338,10 +343,25 @@ namespace dungeon
 	void dungeon_view::draw(int cx, int cy) const
 	{
 		auto& wm = graphics::window_manager::get_main_window();
-		const int x = tex_.width()/2 - (wm.width() - cx);
-		const int y = tex_.height()/2 - (wm.height() - cy);
-		const rect dst(0, 0, 100, 100);
-		const rect src(0, 0, 100, 100);
-		tex_.blit(src, dst);
+		const int src_x = wm.width() > tex_.width() 
+			? 0 
+			: cx < wm.width()/2 
+				? 0
+				: cx > tex_.width() - wm.width()/2 ? tex_.width()-wm.width() : cx - wm.width()/2;
+		const int src_y = wm.height() > tex_.height() 
+			? 0 
+			: cy < wm.height()/2 
+				? 0
+				: cy > tex_.height() - wm.height()/2 ? tex_.height()-wm.height() : cy - wm.height()/2;
+		const int src_w = wm.width() > tex_.width() ? tex_.width() : wm.width();
+		const int src_h = wm.height() > tex_.height() ? tex_.height() : wm.height();
+
+		const int dst_x = wm.width() > tex_.width() ? (wm.width() - tex_.width())/2 : 0;
+		const int dst_y = wm.height() > tex_.height() ? (wm.height() - tex_.height())/2 : 0;
+		const int dst_w = wm.width() > tex_.width() ? tex_.width() : wm.width();
+		const int dst_h = wm.height() > tex_.height() ? tex_.height() : wm.height();
+
+		tex_.blit(rect(src_x, src_y, src_w, src_h), 
+			rect(dst_x, dst_y, dst_w, dst_h));
 	}
 }
