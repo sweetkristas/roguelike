@@ -18,6 +18,7 @@
 #include "component.hpp"
 #include "creature.hpp"
 #include "dialog.hpp"
+#include "dungeon.hpp"
 #include "engine.hpp"
 #include "font.hpp"
 #include "generate_cave.hpp"
@@ -178,6 +179,7 @@ int main(int argc, char* argv[])
 		graphics::texture::manager texture_manager(wm.get_renderer());
 
 		terrain::terrain::load_terrain_data(json::parse_from_file("data/terrain.cfg"));
+		dungeon::load_rules(json::parse_from_file("data/dungeon_rules.cfg"));
 
 		creature::loader(json::parse_from_file("data/creatures.cfg"));
 

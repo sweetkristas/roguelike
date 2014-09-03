@@ -20,6 +20,7 @@
     <ClCompile Include="..\src\creature.cpp" />
     <ClCompile Include="..\src\datetime.cpp" />
     <ClCompile Include="..\src\dialog.cpp" />
+    <ClCompile Include="..\src\dungeon.cpp" />
     <ClCompile Include="..\src\engine.cpp" />
     <ClCompile Include="..\src\filesystem.cpp" />
     <ClCompile Include="..\src\font.cpp" />
@@ -51,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\treetree\iterator_shorthands.hpp" />
-    <ClInclude Include="..\include\treetree\tree.hpp" />
     <ClInclude Include="..\src\action_process.hpp" />
     <ClInclude Include="..\src\ai_process.hpp" />
     <ClInclude Include="..\src\basic_dir_monitor.hpp" />
@@ -63,6 +63,7 @@
     <ClInclude Include="..\src\datetime.hpp" />
     <ClInclude Include="..\src\dialog.hpp" />
     <ClInclude Include="..\src\dir_monitor.hpp" />
+    <ClInclude Include="..\src\dungeon.hpp" />
     <ClInclude Include="..\src\engine.hpp" />
     <ClInclude Include="..\src\engine_fwd.hpp" />
     <ClInclude Include="..\src\filesystem.hpp" />

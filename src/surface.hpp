@@ -50,6 +50,10 @@ namespace graphics
 		void blit_scaled(const surface_ptr& src, const rect& src_rect, const rect& dst_rect);
 
 		void save(const std::string& filename);
+
+		static surface_ptr create(int width, int height);
+		static surface_ptr create(const std::string& fname);
+		static surface_ptr create(SDL_Surface* surf);
 	private:
 		surface();
 		std::shared_ptr<SDL_Surface> surf_;

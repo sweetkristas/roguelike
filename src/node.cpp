@@ -127,13 +127,18 @@ int64_t node::as_int() const
 	case NODE_TYPE_INTEGER:
 		return i_;
 	case NODE_TYPE_FLOAT:
-		return int64_t(f_);
+		return static_cast<int64_t>(f_);
 	case NODE_TYPE_BOOL:
 		return b_ ? 1 : 0;
 	default: break;
 	}
 	ASSERT_LOG(false, "as_int() type conversion error from " << type_as_string() << " to int");
 	return 0;
+}
+
+int node::as_int32() const
+{
+	return static_cast<int>(as_int());
 }
 
 std::string node::as_string() const

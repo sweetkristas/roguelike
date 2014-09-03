@@ -80,6 +80,7 @@ namespace graphics
 		int height() const { return area_.h(); }
 
 		void blit(const rect& dst) const;
+		void blit(const rect& src_r, const rect& dest_r) const;
 		void blit_ex(const rect& dst, double angle, const point& center, FlipFlags flip) const;
 		static void rebuild_cache();
 	private:

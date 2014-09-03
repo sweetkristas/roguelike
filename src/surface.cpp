@@ -5,6 +5,16 @@
 
 namespace graphics
 {
+	namespace
+	{
+		typedef std::map<std::string, surface_ptr> surface_file_cache;
+		surface_file_cache& get_file_cache() 
+		{
+			static surface_file_cache res;
+			return res;
+		}
+	}
+
 	surface::surface(int width, int height)
 	{
 		// Generates an empty surface of size (width,height)
@@ -64,5 +74,26 @@ namespace graphics
 	{
 		int res = IMG_SavePNG(surf_.get(), filename.c_str());
 		ASSERT_LOG(res == 0, "Error save image file: " << IMG_GetError());
+	}
+
+	surface_ptr surface::create(int width, int height)
+	{
+		return std::make_shared<graphics::surface>(width, height);
+	}
+
+	surface_ptr surface::create(const std::string& fname)
+	{
+		auto it = get_file_cache().find(fname);
+		if(it == get_file_cache().end()) {
+			auto surf = std::make_shared<graphics::surface>(fname);
+			get_file_cache()[fname] = surf;
+			return surf;
+		}
+		return it->second;
+	}
+
+	surface_ptr surface::create(SDL_Surface* surf)
+	{
+		return std::make_shared<graphics::surface>(surf);
 	}
 }

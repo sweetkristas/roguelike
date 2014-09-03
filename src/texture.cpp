@@ -144,6 +144,17 @@ namespace graphics
 		ASSERT_LOG(res == 0, "Failed to blit texture: " << SDL_GetError());
 	}
 
+	void texture::blit(const rect& src_r, const rect& dest_r) const
+	{
+		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");
+		SDL_Rect src = {src_r.x(), src_r.y(), src_r.w(), src_r.h()};
+		SDL_Rect dst = {dest_r.x(), dest_r.y(), dest_r.w() == 0 ? src_r.w() : dest_r.w(), dest_r.h() == 0 ? src_r.h() : dest_r.h()};
+		int res = SDL_SetTextureBlendMode(tex_.get(), blend_mode_);
+		ASSERT_LOG(res == 0, "Blend mode couldn't be set: " << SDL_GetError());
+		res = SDL_RenderCopy(get_renderer(), tex_.get(), &src, &dst);
+		ASSERT_LOG(res == 0, "Failed to blit texture: " << SDL_GetError());
+	}
+
 	void texture::blit_ex(const rect& dest, double angle, const point& center, FlipFlags flip) const
 	{
 		ASSERT_LOG(get_renderer() != nullptr, "Renderer not set. call graphics::texture::manager texman(...);");

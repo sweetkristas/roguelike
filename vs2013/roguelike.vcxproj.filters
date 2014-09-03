@@ -132,6 +132,9 @@
     <ClCompile Include="..\src\texpack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\dungeon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\filesystem.hpp">
@@ -281,7 +284,7 @@
     <ClInclude Include="..\include\treetree\iterator_shorthands.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\treetree\tree.hpp">
+    <ClInclude Include="..\src\dungeon.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

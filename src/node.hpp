@@ -47,6 +47,7 @@ public:
 	static node from_bool(bool b);
 
 	std::string as_string() const;
+	int as_int32() const;
 	int64_t as_int() const;
 	float as_float() const;
 	bool as_bool() const;
