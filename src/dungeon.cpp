@@ -18,7 +18,6 @@ namespace dungeon
 			N,
 			NE,
 			W,
-			CENTER,
 			E,
 			SW,
 			S,
@@ -30,6 +29,9 @@ namespace dungeon
 
 		const int min_dungeon_size = 16;
 		const int max_dungeon_size = 64;
+
+		const int min_room_size = 5;
+		const int max_room_size = 8;
 
 		const int any_value = 0;
 		const int nil_value = 1;
@@ -132,13 +134,13 @@ namespace dungeon
 			return Direction::N;
 		}
 
-		int match_tile(const std::vector<int>& surrounds)
+		int match_tile(int tile, const std::vector<int>& surrounds)
 		{
 			int max_dir = static_cast<int>(Direction::MAX);
 			ASSERT_LOG(surrounds.size() == max_dir, "Surrounds is wrong size: " << surrounds.size() << " != " << max_dir);
-			auto it = get_rule_map().find(surrounds[static_cast<int>(Direction::CENTER)]);
+			auto it = get_rule_map().find(tile);
 			ASSERT_LOG(it != get_rule_map().end(), 
-				"Couldn't find a dungeon rule matching the value: " << static_cast<int>(Direction::CENTER));
+				"Couldn't find a dungeon rule matching the value: " << tile);
 			const auto& dr = it->second;
 			auto& rules = dr.get_rules();
 			
@@ -147,7 +149,7 @@ namespace dungeon
 				for(int n = 0; n != max_dir; ++n) {
 					const int t1 = surrounds[n];
 					const int t2 = rule.matches[n];
-					if(t2 == any_value || t1 == t2 || t1 != -t2) {
+					if(t2 == any_value || t1 == t2 || (t2 < 0 && t1 != -t2)) {
 						continue;
 					}
 					accept = false;
@@ -176,7 +178,7 @@ namespace dungeon
 			const int tiles_x = img.tex->width()  / (img.tile_size + img.padding);
 			const int tiles_y = img.tex->height() / (img.tile_size + img.padding);
 			const int x = (index % tiles_x) * (img.tile_size + img.padding);
-			const int y = (index / tiles_y) * (img.tile_size + img.padding);
+			const int y = (index / tiles_x) * (img.tile_size + img.padding);
 			return rect(x, y, img.tile_size, img.tile_size);
 		}
 	}
@@ -251,7 +253,7 @@ namespace dungeon
 		for(auto& rule : rule_map) {
 			// First element is the name of the tile. Second element is the details
 			const auto& name = rule.first.as_string();
-				auto it = get_name_index_map().find(name);
+			auto it = get_name_index_map().find(name);
 			ASSERT_LOG(it != get_name_index_map().end(), "Something bad happened " << name << " wasn't found in our internal list.");
 			int name_index = it->second;
 			const int default_index = rule.second["default_index"].as_int32();
@@ -265,8 +267,6 @@ namespace dungeon
 				tile_rules.push_back(tile_rule());
 				tile_rules.back().index = r["index"].as_int32();
 				tile_rules.back().matches.resize(static_cast<int>(Direction::MAX), 0);
-				// Add center tile
-				tile_rules.back().matches[static_cast<int>(Direction::CENTER)] = name_index;
 				for(auto& rmap : r["map"].as_map()) {
 					auto value = rmap.second.as_string();
 					bool negate = false;
@@ -289,23 +289,118 @@ namespace dungeon
 	{
 	}
 
+	enum class DungeonFeature
+	{
+		ROOM,
+		OCTAGONAL_ROOM,
+		CORRIDOR,
+		MAX,
+	};
+
+	const char ceiling = '#';
+	const char floor   = '.';
+	const char pit     = 'X';
+	const char lava    = '~';
+	const char door    = 'D';
+	const char wall    = 'T';
+	class dungeon_generator
+	{
+	public:
+		dungeon_generator(int width, int height) 
+			: width_(width),
+			  height_(height)
+		{
+			// Generate a blank map.
+			nmap_.resize(height);
+			for(auto& row : nmap_) {
+				row.resize(width, ceiling);
+			}
+			
+			int rs_w = generator::get_uniform_int<int>(min_room_size, max_room_size);
+			int rs_h = generator::get_uniform_int<int>(min_room_size, max_room_size);
+			rect r((width-rs_w)/2, (height-rs_h)/2, rs_w, rs_h);
+			if(!place_room(r)) {
+				ASSERT_LOG(false, "Couldn't place an initial room -- this is very very bad.");
+			}
+		}
+		void fill_rect(const rect& r, char c) {
+		}
+		bool is_rect_filled(const rect& r, char c) {
+			for(int y = 0; y != r.h(); ++y) {
+				for(int x = 0; x != r.w(); ++x) {
+					if(nmap_[y+r.y()][x+r.x()] != c) {
+						return false;
+					}					
+				}
+			}
+			return true;
+		}
+		bool place_room(const rect& r) {
+			if(is_rect_filled(r, ceiling)) {
+				create_room(r);
+				return true;
+			}
+			return false;
+		}
+		void create_room(const rect& r) {
+			for(int y = 0; y != r.h(); ++y) {
+				for(int x = 0; x != r.w(); ++x) {
+					int wx = x + r.x();
+					int wy = y + r.y();
+					nmap_[wy][wx] = floor;
+					if(x == 0 || y == 0 || x == r.w()-1 || y == r.h()-1) {
+						wall_list_.emplace_back(wx, wy);
+						nmap_[wy][wx] = wall;
+					}
+				}
+			}
+		}
+		void create_new_feature() {
+			// Select a random feature
+			DungeonFeature feature = static_cast<DungeonFeature>(generator::get_uniform_int<int>(0, static_cast<int>(DungeonFeature::MAX)-1));
+			switch(feature) {
+				case DungeonFeature::ROOM: break;
+				case DungeonFeature::OCTAGONAL_ROOM: break;
+				case DungeonFeature::CORRIDOR: break;
+				default: break;
+			}
+		}
+		const std::vector<std::vector<char>>& get_map() const { return nmap_; } 
+	private:
+		int width_;
+		int height_;
+		std::vector<std::vector<char>> nmap_;
+		std::vector<std::pair<int,int>> wall_list_;
+	};
+
 	dungeon_model_ptr dungeon_model::generate()
 	{
-		auto dung = std::make_shared<dungeon_model>();
-		dung->width_ = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
-		dung->height_ = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
-		dung->tile_map_.resize(dung->height_);
-		for(auto& row : dung->tile_map_) {
-			row.resize(dung->width_);
-		}
+		//auto dung = std::make_shared<dungeon_model>();
+		//dung->width_ = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
+		//dung->height_ = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
+		//dung->tile_map_.resize(dung->height_);
+		//for(auto& row : dung->tile_map_) {
+		//	row.resize(dung->width_);
+		//}
 
-		for(int y = 0; y != dung->height_; ++y) {
+		int width = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
+		int height = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
+
+		dungeon_generator gen(width, height);
+
+		// Convert the ascii map to internal model
+		auto dung = std::make_shared<dungeon_model>();
+		dung->width_ = width;
+		dung->height_ = height;
+		dung->tile_map_.resize(dung->height_);
+		int y = 0;
+		for(auto& row : dung->tile_map_) {
+			int x = 0;
+			row.resize(dung->width_);
 			for(int x = 0; x != dung->width_; ++x) {
-				//int r = generator::get_uniform_int<int>(2, static_cast<int>(get_index_name_map().size()-1));
-				//auto it = get_index_name_map().begin();
-				//std::advance(it, r);
-				dung->tile_map_[y][x] = get_name_index_map()["wall"];//it->first;
+				row[x] = get_tile_type_from_ascii(gen.get_map()[y][x]);
 			}
+			++y;
 		}
 		return dung;
 	}
@@ -361,7 +456,7 @@ namespace dungeon
 
 		image& img = get_surface_from_level(level);
 
-		std::vector<int> surrounds(9);
+		std::vector<int> surrounds(static_cast<int>(Direction::MAX));
 		surface_ptr dest = graphics::surface::create(model->width()*img.tile_size, model_->height()*img.tile_size);
 
 		for(int y = 0; y != model_->height(); ++y) {
@@ -370,12 +465,11 @@ namespace dungeon
 				surrounds[1] = model_->get_at(x+0, y-1);
 				surrounds[2] = model_->get_at(x+1, y-1);
 				surrounds[3] = model_->get_at(x-1, y+0);
-				surrounds[4] = model_->get_at(x+0, y+0);
-				surrounds[5] = model_->get_at(x+1, y+0);
-				surrounds[6] = model_->get_at(x-1, y+1);
-				surrounds[7] = model_->get_at(x+0, y+1);
-				surrounds[8] = model_->get_at(x+1, y+1);
-				rect area = get_tile_area_from_index(img, match_tile(surrounds));
+				surrounds[4] = model_->get_at(x+1, y+0);
+				surrounds[5] = model_->get_at(x-1, y+1);
+				surrounds[6] = model_->get_at(x+0, y+1);
+				surrounds[7] = model_->get_at(x+1, y+1);
+				rect area = get_tile_area_from_index(img, match_tile(model_->get_at(x+0, y+0), surrounds));
 				dest->blit_scaled(img.tex, area, rect(x*img.tile_size, y*img.tile_size, img.tile_size, img.tile_size));
 			}
 		}

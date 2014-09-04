@@ -157,6 +157,7 @@ int main(int argc, char* argv[])
 
 	try {
 		graphics::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+		SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengl", SDL_HINT_OVERRIDE);
 		graphics::window_manager wm;
 		sdl_gl_setup();
 		wm.create_window("roguelike",
@@ -205,22 +206,22 @@ int main(int argc, char* argv[])
 		e.add_process(std::make_shared<process::em_collision>());
 		e.add_process(std::make_shared<process::ee_collision>());
 
-
 		////////////////////////////////////////////
 		// test code block
 		graphics::texture darkness(wm.width(), wm.height(), graphics::TextureFlags::NO_CACHE | graphics::TextureFlags::TARGET);
 		graphics::texture light("images/light.png", graphics::TextureFlags::NONE);
 		darkness.set_blend(graphics::BlendMode::BLEND);
-		light.set_blend(graphics::BlendMode::MODULATE);
+		//light.set_blend(graphics::BlendMode::ADDITIVE);
 		SDL_SetRenderTarget(wm.get_renderer(), darkness.get());
 		SDL_SetRenderDrawColor(wm.get_renderer(), 16, 16, 32, 224);
 		SDL_RenderClear(wm.get_renderer());
-		light.blit(rect((wm.width()-e.get_tile_size().x*4)/2, (wm.height()-e.get_tile_size().y*4)/2, e.get_tile_size().x*4, e.get_tile_size().y*4));
+
+		//light.blit(rect((wm.width()-e.get_tile_size().x*4)/2, (wm.height()-e.get_tile_size().y*4)/2, e.get_tile_size().x*4, e.get_tile_size().y*4));
 
 		SDL_SetRenderTarget(wm.get_renderer(), NULL);
 
-		//auto dung = dungeon::dungeon_model::generate();
-		auto dung = dungeon::dungeon_model::read(json::parse_from_file("data/map_test.cfg"));
+		auto dung = dungeon::dungeon_model::generate();
+		//auto dung = dungeon::dungeon_model::read(json::parse_from_file("data/map_test.cfg"));
 		dungeon::dungeon_view dv(dung);
 		////////////////////////////////////////////
 		SDL_SetRenderDrawColor(wm.get_renderer(), 0, 0, 0, 255);
@@ -231,6 +232,7 @@ int main(int argc, char* argv[])
 			SDL_RenderClear(wm.get_renderer());
 			running = e.update(60.0/1000.0);
 			dv.draw(0,0);
+			//darkness.blit(rect(0, 0));
 			draw_perf_stats(e, tm.get_time());
 			SDL_RenderPresent(wm.get_renderer());
 	
