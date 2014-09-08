@@ -137,7 +137,7 @@ namespace dungeon
 		int match_tile(int tile, const std::vector<int>& surrounds)
 		{
 			int max_dir = static_cast<int>(Direction::MAX);
-			ASSERT_LOG(surrounds.size() == max_dir, "Surrounds is wrong size: " << surrounds.size() << " != " << max_dir);
+			ASSERT_LOG(surrounds.size() == static_cast<unsigned>(max_dir), "Surrounds is wrong size: " << surrounds.size() << " != " << max_dir);
 			auto it = get_rule_map().find(tile);
 			ASSERT_LOG(it != get_rule_map().end(), 
 				"Couldn't find a dungeon rule matching the value: " << tile);
@@ -454,7 +454,7 @@ namespace dungeon
 
 		int level = 0;
 
-		image& img = get_surface_from_level(level);
+		const auto& img = get_surface_from_level(level);
 
 		std::vector<int> surrounds(static_cast<int>(Direction::MAX));
 		surface_ptr dest = graphics::surface::create(model->width()*img.tile_size, model_->height()*img.tile_size);

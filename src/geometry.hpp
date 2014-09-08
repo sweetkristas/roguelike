@@ -126,7 +126,7 @@ namespace geometry
 		T mid_x() const { return (x1() + x2())/static_cast<T>(2); }
 		T mid_y() const { return (y1() + y2())/static_cast<T>(2); }
 
-		Point<T> mid() const { return point((x1() + x2())/static_cast<T>(2), (y1() + y2())/static_cast<T>(2)); }
+		Point<T> mid() const { return Point<T>((x1() + x2())/static_cast<T>(2), (y1() + y2())/static_cast<T>(2)); }
 
 		bool empty() const { return w() == 0 || h() == 0; }
 
