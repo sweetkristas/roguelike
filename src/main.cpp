@@ -36,6 +36,9 @@
 #include "unit_test.hpp"
 #include "wm.hpp"
 
+#include <bgfxplatform.h>
+#include <bgfx.h>
+
 #define FRAME_RATE	(static_cast<int>(1000.0/60.0))
 
 void sdl_gl_setup()
@@ -170,6 +173,9 @@ int main(int argc, char* argv[])
 		wm.gl_init();
 
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
+		bgfx::sdlSetWindow(wm.get_window());
+		bgfx::init();
 
 		bool running = true;
 

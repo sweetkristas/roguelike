@@ -55,15 +55,16 @@ BASE_CXXFLAGS += -std=c++11 -g -rdynamic -fno-inline-functions \
 	-fthreadsafe-statics -Werror -Wall -Wno-reorder -Wno-unused-variable
 
 # Compiler include options, used after CXXFLAGS and CPPFLAGS.
-INC := -Isrc -Iinclude $(shell pkg-config --cflags x11 sdl2 glew SDL2_image SDL2_ttf libpng zlib)
+INC := -Isrc -Iinclude -I../bgfx/include -I../bx/include $(shell pkg-config --cflags x11 sdl2 glew SDL2_image SDL2_ttf libpng zlib)
 
 ifdef STEAM_RUNTIME_ROOT
 	INC += -I$(STEAM_RUNTIME_ROOT)/include
 endif
 
 # Linker library options.
-LIBS := $(shell pkg-config --libs x11 gl ) \
-	$(shell pkg-config --libs sdl2 glew SDL2_image libpng zlib) -lSDL2_ttf -lSDL2_mixer
+LIBS := ../bgfx/.build/linux64_gcc/bin/libbgfxRelease.a $(shell pkg-config --libs x11 gl ) \
+	$(shell pkg-config --libs sdl2 glew SDL2_image libpng zlib) -lSDL2_ttf -lSDL2_mixer \
+    -L../bgfx/.build/linux64_gcc/bin
 
 include Makefile.common
 
