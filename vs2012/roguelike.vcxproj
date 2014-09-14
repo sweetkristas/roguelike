@@ -99,13 +99,13 @@
     <ClInclude Include="..\src\wm.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\assimp-3.1.1\lib32\assimp.lib" />
     <Library Include="..\..\noise\win32\Release\libnoise.lib" />
     <Library Include="..\..\SDL\VisualC\SDLmain\Win32\Release\SDL2main.lib" />
     <Library Include="..\..\SDL\VisualC\SDL\Win32\Release\SDL2.lib" />
     <Library Include="..\..\SDL_image\VisualC\Win32\Release\SDL2_image.lib" />
     <Library Include="..\..\SDL_mixer\VisualC\Release\SDL2_mixer.lib" />
     <Library Include="..\..\SDL_ttf\VisualC\Win32\Release\SDL2_ttf.lib" />
+    <Library Include="..\external\lib\bgfxDebug.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\geometry.inl" />
@@ -156,7 +156,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Projects\boost;C:\Projects\SDL\include;C:\Projects\SDL_image;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\roguelike\include;C:\Projects\assimp-3.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Projects\bx\include;C:\Projects\bgfx\include;C:\Projects\boost;C:\Projects\SDL\include;C:\Projects\SDL_image;C:\Projects\SDL_mixer;C:\Projects\SDL_ttf;C:\Projects\roguelike\include;C:\Projects\assimp-3.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

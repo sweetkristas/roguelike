@@ -277,13 +277,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\..\assimp-3.1.1\lib32\assimp.lib" />
     <Library Include="..\..\SDL\VisualC\SDL\Win32\Release\SDL2.lib" />
     <Library Include="..\..\SDL\VisualC\SDLmain\Win32\Release\SDL2main.lib" />
     <Library Include="..\..\SDL_image\VisualC\Win32\Release\SDL2_image.lib" />
     <Library Include="..\..\SDL_mixer\VisualC\Release\SDL2_mixer.lib" />
     <Library Include="..\..\SDL_ttf\VisualC\Win32\Release\SDL2_ttf.lib" />
     <Library Include="..\..\noise\win32\Release\libnoise.lib" />
+    <Library Include="..\external\lib\bgfxDebug.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\geometry.inl">
