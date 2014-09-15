@@ -283,7 +283,6 @@
     <Library Include="..\..\SDL_mixer\VisualC\Release\SDL2_mixer.lib" />
     <Library Include="..\..\SDL_ttf\VisualC\Win32\Release\SDL2_ttf.lib" />
     <Library Include="..\..\noise\win32\Release\libnoise.lib" />
-    <Library Include="..\external\lib\bgfxDebug.lib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\geometry.inl">

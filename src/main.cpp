@@ -36,9 +36,6 @@
 #include "unit_test.hpp"
 #include "wm.hpp"
 
-#include <bgfxplatform.h>
-#include <bgfx.h>
-
 #define FRAME_RATE	(static_cast<int>(1000.0/60.0))
 
 void sdl_gl_setup()
@@ -174,9 +171,6 @@ int main(int argc, char* argv[])
 
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
-		bgfx::sdlSetWindow(wm.get_window());
-		bgfx::init();
-
 		bool running = true;
 
 		// XXX Try and load a save file here, including random seed. If no save file we generate a new seed
@@ -196,8 +190,6 @@ int main(int argc, char* argv[])
 		// to the update function.
 		engine e(wm);
 		e.set_tile_size(terrain::terrain::get_terrain_size());
-		//auto cave = create_cave(e);
-		//create_player(e, cave->get()->map->start);
 
 		create_player(e, point(0, 0));
 		create_world(e);		
@@ -226,7 +218,7 @@ int main(int argc, char* argv[])
 
 		SDL_SetRenderTarget(wm.get_renderer(), NULL);
 
-		auto dung = dungeon::dungeon_model::generate();
+		auto dung = dungeon::dungeon_model::generate(1);
 		//auto dung = dungeon::dungeon_model::read(json::parse_from_file("data/map_test.cfg"));
 		dungeon::dungeon_view dv(dung);
 		////////////////////////////////////////////

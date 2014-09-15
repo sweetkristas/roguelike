@@ -21,7 +21,7 @@ namespace dungeon
 		int height() const { return height_; }
 		int get_at(int x, int y);
 		// Generate a level, populating it with things.
-		static dungeon_model_ptr generate();
+		static dungeon_model_ptr generate(int level);
 		static dungeon_model_ptr read(const node& n);
 		node write();
 	private:

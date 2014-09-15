@@ -3,6 +3,7 @@
 
 #include "asserts.hpp"
 #include "dungeon.hpp"
+#include "node_utils.hpp"
 #include "profile_timer.hpp"
 #include "random.hpp"
 #include "texture.hpp"
@@ -102,11 +103,24 @@ namespace dungeon
 			static ascii_map_type res;
 			return res;
 		}
+		typedef std::map<int, char> to_ascii_map_type;
+		to_ascii_map_type& get_to_ascii_map()
+		{
+			static to_ascii_map_type res;
+			return res;
+		}
 
 		int get_tile_type_from_ascii(char c)
 		{
 			auto it = get_ascii_map().find(c);
 			ASSERT_LOG(it != get_ascii_map().end(), "Unable to find ascii symbol '" << c << "' in the list.");
+			return it->second;
+		}
+
+		char get_ascii_from_tile_type(int tt)
+		{
+			auto it = get_to_ascii_map().find(tt);
+			ASSERT_LOG(it != get_to_ascii_map().end(), "Unable to find tiletype value '" << tt << "' in the list.");
 			return it->second;
 		}
 
@@ -261,6 +275,7 @@ namespace dungeon
 			auto am_it = get_ascii_map().find(ascii_char);
 			ASSERT_LOG(am_it == get_ascii_map().end(), "ASCII character for '" << name << "' already used.");
 			get_ascii_map()[ascii_char] = name_index;
+			get_to_ascii_map()[name_index] = ascii_char;
 			std::vector<tile_rule> tile_rules;
 			for(auto& r : rule.second["rules"].as_list()) {
 				ASSERT_LOG(r.has_key("index") && r.has_key("map"), "rules must have 'index' and 'map' attributes.");
@@ -297,6 +312,8 @@ namespace dungeon
 		MAX,
 	};
 
+	// XXX all these mappings should be in a dungeon_controller class.
+	// Preferably read from file.
 	const char ceiling = '#';
 	const char floor   = '.';
 	const char pit     = 'X';
@@ -316,16 +333,29 @@ namespace dungeon
 				row.resize(width, ceiling);
 			}
 			
-			int rs_w = generator::get_uniform_int<int>(min_room_size, max_room_size);
-			int rs_h = generator::get_uniform_int<int>(min_room_size, max_room_size);
-			rect r((width-rs_w)/2, (height-rs_h)/2, rs_w, rs_h);
+			rect r = get_random_room_size();
+			r += point((width-r.w())/2, (height-r.h())/2);
 			if(!place_room(r)) {
 				ASSERT_LOG(false, "Couldn't place an initial room -- this is very very bad.");
 			}
 		}
+		rect get_random_room_size(int x=0, int y=0) {
+			int rs_w = generator::get_uniform_int<int>(min_room_size, max_room_size);
+			int rs_h = generator::get_uniform_int<int>(min_room_size, max_room_size);
+			return rect(x, y, rs_w, rs_h);
+		}
 		void fill_rect(const rect& r, char c) {
+			ASSERT_LOG(r.x2() < width_ && r.x() < width_, "Co-ordinates to fill are outside width. " << width_ << " : " << r.x() << " " << r.x2());
+			ASSERT_LOG(r.y2() < height_ && r.y() < height_, "Co-ordinates to fill are outside height. " << height_ << " : " << r.y() << " " << r.y2());
+			for(int y = r.y(); y != r.y2(); y++) {
+				for(int x = r.x(); x != r.x2(); ++x) {
+					nmap_[y][x] = c;
+				}
+			}
 		}
 		bool is_rect_filled(const rect& r, char c) {
+			ASSERT_LOG(r.x2() < width_ && r.x() < width_, "Co-ordinates to fill are outside width. " << width_ << " : " << r.x() << " " << r.x2());
+			ASSERT_LOG(r.y2() < height_ && r.y() < height_, "Co-ordinates to fill are outside height. " << height_ << " : " << r.y() << " " << r.y2());
 			for(int y = 0; y != r.h(); ++y) {
 				for(int x = 0; x != r.w(); ++x) {
 					if(nmap_[y+r.y()][x+r.x()] != c) {
@@ -343,6 +373,8 @@ namespace dungeon
 			return false;
 		}
 		void create_room(const rect& r) {
+			ASSERT_LOG(r.x2() < width_ && r.x() < width_, "Co-ordinates to fill are outside width. " << width_ << " : " << r.x() << " " << r.x2());
+			ASSERT_LOG(r.y2() < height_ && r.y() < height_, "Co-ordinates to fill are outside height. " << height_ << " : " << r.y() << " " << r.y2());
 			for(int y = 0; y != r.h(); ++y) {
 				for(int x = 0; x != r.w(); ++x) {
 					int wx = x + r.x();
@@ -355,15 +387,57 @@ namespace dungeon
 				}
 			}
 		}
-		void create_new_feature() {
+		bool create_new_feature() {
 			// Select a random feature
 			DungeonFeature feature = static_cast<DungeonFeature>(generator::get_uniform_int<int>(0, static_cast<int>(DungeonFeature::MAX)-1));
 			switch(feature) {
-				case DungeonFeature::ROOM: break;
+				case DungeonFeature::ROOM: return create_new_room();
 				case DungeonFeature::OCTAGONAL_ROOM: break;
 				case DungeonFeature::CORRIDOR: break;
 				default: break;
 			}
+			return false;
+		}
+		// returns true on successfully creating a new room, false if we fail.
+		bool create_new_room() {
+			// choose a wall
+			auto& wll = choose_wall();
+			// Check it's still a wall.
+			if(nmap_[wll.second][wll.first] != wall) {
+				return false;
+			}
+			point corridor_location;
+			rect rs = get_random_room_size();
+			// Check each of the four cardinal directions to see if there is a free 
+			// ceiling space to create a corridor
+			if(nmap_[wll.second-1][wll.first] == ceiling) {
+				// north
+				corridor_location = point(wll.first, wll.second-1);
+				// XXX adjust rs x/y as needed here
+			} else if(nmap_[wll.second+1][wll.first] == ceiling) {
+				// south
+				corridor_location = point(wll.first, wll.second+1);
+				// XXX adjust rs x/y as needed here
+			} else if(nmap_[wll.second][wll.first+1] == ceiling) {
+				// east
+				corridor_location = point(wll.first+1, wll.second);
+				// XXX adjust rs x/y as needed here
+			} else if(nmap_[wll.second][wll.first-1] == ceiling) {
+				// west
+				corridor_location = point(wll.first-1, wll.second);
+				// XXX adjust rs x/y as needed here
+			} else {
+				return false;
+			}
+			if(!place_room(rs)) {
+				return false;
+			}
+			create_room(rs);
+			nmap_[corridor_location.y][corridor_location.x] = floor;
+			return true;
+		}
+		const std::pair<int,int>& choose_wall() {
+			return wall_list_[generator::get_uniform_int<int>(0, wall_list_.size()-1)];
 		}
 		const std::vector<std::vector<char>>& get_map() const { return nmap_; } 
 	private:
@@ -373,16 +447,8 @@ namespace dungeon
 		std::vector<std::pair<int,int>> wall_list_;
 	};
 
-	dungeon_model_ptr dungeon_model::generate()
+	dungeon_model_ptr dungeon_model::generate(int level)
 	{
-		//auto dung = std::make_shared<dungeon_model>();
-		//dung->width_ = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
-		//dung->height_ = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
-		//dung->tile_map_.resize(dung->height_);
-		//for(auto& row : dung->tile_map_) {
-		//	row.resize(dung->width_);
-		//}
-
 		int width = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
 		int height = generator::get_uniform_int<int>(min_dungeon_size, max_dungeon_size);
 
@@ -390,6 +456,7 @@ namespace dungeon
 
 		// Convert the ascii map to internal model
 		auto dung = std::make_shared<dungeon_model>();
+		dung->level_ = level;
 		dung->width_ = width;
 		dung->height_ = height;
 		dung->tile_map_.resize(dung->height_);
@@ -419,6 +486,7 @@ namespace dungeon
 			dung->tile_map_[y].resize(row_str.size());
 			int x = 0;
 			for(char c : row_str) {
+				// XXX this should be modified to use a dungeon_controller object to hold the mapping.
 				dung->tile_map_[y][x] = get_tile_type_from_ascii(c);
 				++x;
 			}
@@ -434,7 +502,17 @@ namespace dungeon
 
 	node dungeon_model::write()
 	{
-		return node();
+		node_builder res;
+		res.add("level", level_);
+		for(auto& row : tile_map_) {
+			std::string map_row;
+			for(auto& col : row) {
+				// XXX this should be modified to use a dungeon_controller object to hold the mapping.
+				map_row += get_ascii_from_tile_type(col);
+			}
+			res.add("map", map_row);
+		}			
+		return res.build();
 	}
 
 	int dungeon_model::get_at(int x, int y)
