@@ -338,6 +338,14 @@ namespace dungeon
 			if(!place_room(r)) {
 				ASSERT_LOG(false, "Couldn't place an initial room -- this is very very bad.");
 			}
+			profile::timer t;
+			int feature_count = 0;
+			while(feature_count < 10 && t.get_time() < 1000.0) {
+				if(create_new_feature()) {
+					++feature_count;
+				}
+			}
+			std::cerr << "Added " << feature_count << " features in " << t.get_time() << " ms\n";
 		}
 		rect get_random_room_size(int x=0, int y=0) {
 			int rs_w = generator::get_uniform_int<int>(min_room_size, max_room_size);
@@ -345,8 +353,10 @@ namespace dungeon
 			return rect(x, y, rs_w, rs_h);
 		}
 		void fill_rect(const rect& r, char c) {
-			ASSERT_LOG(r.x2() < width_ && r.x() < width_, "Co-ordinates to fill are outside width. " << width_ << " : " << r.x() << " " << r.x2());
-			ASSERT_LOG(r.y2() < height_ && r.y() < height_, "Co-ordinates to fill are outside height. " << height_ << " : " << r.y() << " " << r.y2());
+			ASSERT_LOG(r.x2() < width_ && r.x() < width_, "X Co-ordinates to fill are outside width. " << width_ << " : " << r.x() << " " << r.x2());
+			ASSERT_LOG(r.y2() < height_ && r.y() < height_, "Y Co-ordinates to fill are outside height. " << height_ << " : " << r.y() << " " << r.y2());
+			ASSERT_LOG(r.x() >= 0 && r.x2() >= 0, "X Co-ordinates to fill are less than zero. " << r.x() << " : " << r.x2());
+			ASSERT_LOG(r.y() >= 0 && r.y2() >= 0, "Y Co-ordinates to fill are less than zero. " << r.y() << " : " << r.y2());
 			for(int y = r.y(); y != r.y2(); y++) {
 				for(int x = r.x(); x != r.x2(); ++x) {
 					nmap_[y][x] = c;
@@ -354,8 +364,11 @@ namespace dungeon
 			}
 		}
 		bool is_rect_filled(const rect& r, char c) {
-			ASSERT_LOG(r.x2() < width_ && r.x() < width_, "Co-ordinates to fill are outside width. " << width_ << " : " << r.x() << " " << r.x2());
-			ASSERT_LOG(r.y2() < height_ && r.y() < height_, "Co-ordinates to fill are outside height. " << height_ << " : " << r.y() << " " << r.y2());
+			if(r.x() < 0 || r.x2() < 0 || r.y() < 0 || r.y2() < 0 
+				|| r.x() >= width_ || r.x2() >= width_
+				|| r.y() >= height_ || r.y2() >= height_) {
+				return false;
+			}
 			for(int y = 0; y != r.h(); ++y) {
 				for(int x = 0; x != r.w(); ++x) {
 					if(nmap_[y+r.y()][x+r.x()] != c) {
@@ -410,29 +423,33 @@ namespace dungeon
 			rect rs = get_random_room_size();
 			// Check each of the four cardinal directions to see if there is a free 
 			// ceiling space to create a corridor
-			if(nmap_[wll.second-1][wll.first] == ceiling) {
+			if(wll.second > 0 && nmap_[wll.second-1][wll.first] == ceiling) {
 				// north
 				corridor_location = point(wll.first, wll.second-1);
 				// XXX adjust rs x/y as needed here
-			} else if(nmap_[wll.second+1][wll.first] == ceiling) {
+				rs += point(wll.first - rs.w()/2, wll.second - (rs.h()+1));
+			} else if(wll.second < height_-1 && nmap_[wll.second+1][wll.first] == ceiling) {
 				// south
 				corridor_location = point(wll.first, wll.second+1);
 				// XXX adjust rs x/y as needed here
-			} else if(nmap_[wll.second][wll.first+1] == ceiling) {
+				rs += point(wll.first - rs.w()/2, wll.second+2);
+			} else if(wll.first < width_-1 && nmap_[wll.second][wll.first+1] == ceiling) {
 				// east
 				corridor_location = point(wll.first+1, wll.second);
 				// XXX adjust rs x/y as needed here
-			} else if(nmap_[wll.second][wll.first-1] == ceiling) {
+				rs += point(wll.first+2, wll.second-(rs.h()/2));
+			} else if(wll.first > 0 && nmap_[wll.second][wll.first-1] == ceiling) {
 				// west
 				corridor_location = point(wll.first-1, wll.second);
 				// XXX adjust rs x/y as needed here
+				rs += point(wll.first-(rs.w()+1), wll.second-(rs.h()/2));
 			} else {
 				return false;
 			}
 			if(!place_room(rs)) {
 				return false;
 			}
-			create_room(rs);
+			//create_room(rs);
 			nmap_[corridor_location.y][corridor_location.x] = floor;
 			return true;
 		}

@@ -1,12 +1,9 @@
 #pragma once
-#ifndef PROFILE_TIMER_HPP_INCLUDED
-#define PROFILE_TIMER_HPP_INCLUDED
 
 #include "SDL.h"
 #include <iostream>
 #include <string>
 
-#if SDL_VERSION_ATLEAST(2,0,0)
 namespace profile 
 {
 	struct manager
@@ -49,15 +46,3 @@ namespace profile
 		}
 	};
 }
-#else
-namespace profile
-{
-	struct manager
-	{
-		manager()  {}
-		~manager() {}
-	};
-}
-#endif
-
-#endif 
