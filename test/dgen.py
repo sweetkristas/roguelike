@@ -70,6 +70,10 @@ class dungeon_generator(object):
                 self._map[y][x] = corridor
                 self._wall_list.append((x,y))
         shuffle(self._wall_list)
+    def create_corridor_ex(self, r, nmap):
+        for y in range(r[1], r[1]+r[3]):
+            for x in range(r[0], r[0]+r[2]):
+                nmap[y][x] = corridor
     def create_feature(self):
         ri = randint(1,100)
         if ri < 30:
@@ -84,18 +88,34 @@ class dungeon_generator(object):
             print 'Item at (%d,%d) not wall (%c)' % (wll[0], wll[1], self._map[wll[1]][wll[0]])
             return (False, [])
         return (True, wll)        
-       
+    def bitmap_compare(self, r, feature, blank):
+		"""Compares the given feature, assuming it is a in rectangular shape bounded by r. to the map
+			starting the comparison at offsets r[0],r[1]
+			blank is the value to consider as empty for comparison purposes.
+			r would be the bounding box on the map of  the feature.
+		"""
+		for y in range(0, r[3]):
+			for x in range(0, r[2]):
+				if self._map[y+r[1]][x+r[0]] != blank and feature[y][x] != blank:
+					return False
+		return True
+	def create_empty_map(self, width, height, blank=ceiling):
+		nmap = []
+		for y in range(0, height):
+			nmap.append([blank,] * width)
+		return nmap
     def create_corridor_feature(self):
         corridor_length = randint(min_corridor_length, max_corridor_length)
         (ret, wall) = self.choose_wall()
         if ret == False: return False
+		rs = self.get_random_room_size()
         if wall[1] > 0 and self._map[wall[1]-1][wall[0]] == ceiling:
             # north
             corridor_location = (wall[0], wall[1]-1)
             rx = wall[0]
             ry = wall[1] - (corridor_length+1)
-            rw = 1
-            rh = corridor_length
+			nmap = self.create_empty_map(rs[0], rs[1]+corridor_length)
+			self.create_corridor_ex((rs[0]/2, ), nmap)
         elif wall[1] < self._height-1 and self._map[wall[1]+1][wall[0]] == ceiling:
             # south
             corridor_location = (wall[0], wall[1]+1)
@@ -120,9 +140,14 @@ class dungeon_generator(object):
         else:
             print 'No dir from wall'
             return False
-        if not self.place_corridor((rx,ry,rw,rh)):
-            print 'Couldn\'t place corridor: (%d,%d,%d,%d)' % (rx,ry,rw,rh)
-            return False
+		# Create feature
+		feature = []
+		for y in range(ry, ry+rh):
+			for x in range(rx, rx+rw):
+				feature
+        #if not self.place_corridor((rx,ry,rw,rh)):
+        #    print 'Couldn\'t place corridor: (%d,%d,%d,%d)' % (rx,ry,rw,rh)
+        #    return False
         self._map[corridor_location[1]][corridor_location[0]] = corridor
         if self._map[wall[1]][wall[0]] != corridor:
             self._map[wall[1]][wall[0]] = door        
